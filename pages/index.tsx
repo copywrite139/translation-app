@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function Home() {
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
@@ -5,17 +7,21 @@ export default function Home() {
       <p>ATA-style Spanish to English translation practice</p>
       <div style={{ marginTop: '2rem' }}>
         <h2>Welcome!</h2>
-        <p>Your translation practice app is working!</p>
-        <button style={{ 
-          padding: '10px 20px', 
-          backgroundColor: '#0070f3', 
-          color: 'white', 
-          border: 'none', 
-          borderRadius: '5px',
-          cursor: 'pointer'
-        }}>
-          Start Practice (Coming Soon)
-        </button>
+        <p>Practice Spanish to English translation with instant feedback</p>
+        <Link href="/practice">
+          <button style={{ 
+            padding: '15px 30px', 
+            backgroundColor: '#0070f3', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '18px',
+            fontWeight: 'bold'
+          }}>
+            Start Practice Now
+          </button>
+        </Link>
       </div>
     </div>
   )
