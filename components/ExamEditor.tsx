@@ -12,6 +12,20 @@ const box: CSSProperties = {
   boxSizing: "border-box",
 };
 
+function lockExamBox(el: HTMLTextAreaElement | null) {
+  if (!el) return;
+  el.spellcheck = false;
+  el.setAttribute("spellcheck", "false");
+  el.setAttribute("autocorrect", "off");
+  el.setAttribute("autocapitalize", "none");
+  el.setAttribute("autocomplete", "off");
+  el.setAttribute("translate", "no");
+  el.setAttribute("data-gramm", "false");
+  el.setAttribute("data-gramm_editor", "false");
+  el.setAttribute("data-enable-grammarly", "false");
+  el.setAttribute("data-lt-active", "false");
+}
+
 export function ExamTextarea(props: {
   value: string;
   onChange: (value: string) => void;
@@ -21,8 +35,10 @@ export function ExamTextarea(props: {
 }) {
   return (
     <textarea
+      ref={lockExamBox}
       value={props.value}
       onChange={(e) => props.onChange(e.target.value)}
+      onFocus={(e) => lockExamBox(e.currentTarget)}
       disabled={props.disabled}
       rows={props.rows ?? 8}
       spellCheck={false}

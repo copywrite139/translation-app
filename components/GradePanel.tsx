@@ -17,7 +17,11 @@ export function MicroGrade(props: { grade: GradeResult; patternNote?: string | n
       >
         <strong style={{ fontSize: "20px" }}>{microHeadline(grade)}</strong>
         <div style={{ marginTop: "0.35rem" }}>Error points on this item: {grade.points}</div>
-        {bad ? (
+        {grade.blocksAdvance ? (
+          <div style={{ marginTop: "0.35rem" }}>
+            Major omission. The next sentence stays locked until this rendering carries the missing meaning.
+          </div>
+        ) : bad ? (
           <div style={{ marginTop: "0.35rem" }}>
             The trap fired. This is not a clean rendering. A full passage passes at {PASS_LINE} or under; these marks total {grade.points}.
           </div>

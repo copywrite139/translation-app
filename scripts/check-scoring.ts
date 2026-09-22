@@ -18,6 +18,26 @@ const lower = gradeItem(congress, "Mexican congressman José Ramírez met with t
 if (!lower.fired.some((f) => f.category === "SP")) throw new Error("lowercase titles should be SP");
 if (lower.fired.some((f) => f.category === "O")) throw new Error("nationality is present");
 
+const fragment = gradeItem(congress, "Mexican");
+if (!fragment.blocksAdvance || !fragment.fired.some((f) => f.code === "O8")) {
+  throw new Error(`fragment should be major O, got ${fragment.verdict}`);
+}
+if (/good start/i.test(JSON.stringify(fragment))) throw new Error("Good start leaked");
+
+const noPeriod = gradeItem(congress, "Mexican Congressman José Ramírez met with the Secretary of State");
+if (!noPeriod.fired.some((f) => f.trapId === "builtin-terminal")) {
+  throw new Error(`missing period not flagged: ${noPeriod.verdict}`);
+}
+if (noPeriod.blocksAdvance) throw new Error("missing period must not lock the next sentence");
+
+const quoteItem = getMicro("4");
+if (!quoteItem) throw new Error("missing item 4");
+const curly = gradeItem(
+  quoteItem,
+  "\u201cThe situation is critical,\u201d declared the president of the European Central Bank."
+);
+if (curly.points !== 0) throw new Error(`curly quotes scored ${curly.points}: ${curly.fired.map((f) => f.trapId).join(",")}`);
+
 if (chargeWeight("P", 8) !== 4) throw new Error("P cap failed");
 if (chargeWeight("SP", 16) !== 4) throw new Error("SP cap failed");
 if (chargeWeight("T", 8) !== 8) throw new Error("T should keep 8");

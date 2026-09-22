@@ -31,6 +31,8 @@ export type GradeResult = {
   points: number;
   clean: boolean;
   perfect: boolean;
+  /** Major omission or a blank box. The next sentence stays locked. */
+  blocksAdvance: boolean;
   scaleLabel: string;
   verdict: string;
   fired: FiredMark[];
@@ -64,8 +66,8 @@ export function normalize(raw: string): string {
 export function normalizeKeepCase(raw: string): string {
   return (raw || "")
     .normalize("NFC")
-    .replace(/[\u2018\u2019\u2032]/g, "'")
-    .replace(/[\u201C\u201D\u2033]/g, '"')
+    .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'")
+    .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')
     .replace(/[\u00A0]/g, " ")
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
@@ -103,9 +105,14 @@ export function scaleLabel(points: number): string {
   return "FAIL (≥18) · NO REVIEW (≥26)";
 }
 
-function prepExact(s: string, stripPeriod: boolean): string {
+function terminalMark(s: string): string {
+  const m = normalizeKeepCase(s).match(/[.!?。]["']?\s*$/u);
+  return m ? m[0].replace(/["'\s]/g, "") : "";
+}
+
+function prepExact(s: string, stripTerminal: boolean): string {
   let n = normalizeKeepCase(s);
-  if (stripPeriod) n = n.replace(/[.。]\s*$/u, "");
+  if (stripTerminal) n = n.replace(/[.!?。]["']?\s*$/u, "").trim();
   return n;
 }
 
@@ -114,10 +121,11 @@ export function isExactOrAcceptable(
   item: { english: string; acceptables?: string[] },
   mode: "micro" | "passage" | "sentence"
 ): boolean {
-  const strip = mode === "micro";
-  const got = prepExact(target, strip);
   const variants = [item.english, ...(item.acceptables ?? [])];
-  return variants.some((v) => prepExact(v, strip) === got);
+  return variants.some((variant) => {
+    const strip = mode === "micro" && !!terminalMark(target) && !!terminalMark(variant);
+    return prepExact(target, strip) === prepExact(variant, strip);
+  });
 }
 
 function emptyHistogram(): Record<ErrorCat, number> {
@@ -241,17 +249,94 @@ function builtinMarks(text: string, mode: "micro" | "passage"): FiredMark[] {
   return marks;
 }
 
+const STOP_WORDS = new Set([
+  "the", "a", "an", "of", "to", "and", "or", "in", "on", "for", "with", "by", "from",
+  "that", "this", "is", "was", "were", "are", "be", "as", "at", "it", "its",
+]);
+
+function stripAccents(s: string): string {
+  return s.normalize("NFD").replace(/\p{M}/gu, "");
+}
+
+function contentWords(s: string): string[] {
+  return stripAccents(normalize(s))
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((w) => w.length > 2 && !STOP_WORDS.has(w));
+}
+
+function referenceAnchors(english: string): string[] {
+  const parts = normalizeKeepCase(english).split(/\s+/);
+  const anchors: string[] = [];
+  parts.forEach((word, index) => {
+    const bare = word.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}.%]+$/gu, "").replace(/[.%]+$/u, "");
+    if (!bare || STOP_WORDS.has(bare.toLowerCase())) return;
+    const isNumber = /\d/.test(bare);
+    const isCap = index > 0 && /^[\p{Lu}]/u.test(bare);
+    const isAccentedName = /[àáâãäåèéêëìíîïòóôõöùúûüñç]/i.test(bare);
+    if (isNumber || isCap || isAccentedName) anchors.push(stripAccents(bare).toLowerCase());
+  });
+  return anchors;
+}
+
+function hasAnchor(folded: string, anchor: string): boolean {
+  return new RegExp(`(?:^|[^\\p{L}\\p{N}])${escapeRegExp(anchor)}(?:$|[^\\p{L}\\p{N}])`, "u").test(` ${folded} `);
+}
+
+/** Omission check. Runs before any other mark. There is no fluency or overlap bonus. */
+function majorOmissionMark(reference: string, text: string, folded: string): FiredMark | null {
+  const refWords = contentWords(reference);
+  const userWords = contentWords(text);
+  const anchors = referenceAnchors(reference);
+  const foldedPlain = stripAccents(folded);
+  const anchorHits = anchors.filter((anchor) => hasAnchor(foldedPlain, anchor)).length;
+  const thin = refWords.length >= 4 && userWords.length <= 1;
+  const droppedAnchors = anchors.length >= 2 && anchorHits / anchors.length < 0.5;
+  if (!thin && !droppedAnchors) return null;
+  return {
+    trapId: "builtin-major-o",
+    category: "O",
+    weight: 8,
+    code: "O8",
+    comment: "Major source content is missing. Omissions are scored before anything else. A short or partial rendering does not get credit for starting the sentence.",
+    okExample: reference.replace(/[.!?。]["']?\s*$/u, ""),
+    pitfall: "Major omission",
+    label: "Major source content omitted",
+    pass: "B",
+    builtin: true,
+  };
+}
+
+function terminalPunctMark(reference: string, text: string): FiredMark | null {
+  if (!terminalMark(reference) || terminalMark(text)) return null;
+  return {
+    trapId: "builtin-terminal",
+    category: "P",
+    weight: 1,
+    code: "P1",
+    comment: "The reference ends with terminal punctuation. The box does not. US prose closes the sentence.",
+    okExample: terminalMark(reference) === "?" ? "End with a question mark." : "End with a period.",
+    pitfall: "Missing terminal punctuation",
+    label: "Final period or question mark missing",
+    pass: "A",
+    builtin: true,
+  };
+}
+
 function lengthWarning(target: string, reference: string): string[] {
-  const a = target.trim().length;
-  const b = reference.trim().length;
-  if (b < 40 || a === 0) return [];
+  const a = wordCount(target);
+  const b = wordCount(reference);
+  if (b < 4 || a === 0) return [];
   const ratio = a / b;
-  if (ratio < 0.45 || ratio > 2.1) {
+  if (ratio < 0.5 || ratio > 2) {
     return [
-      "Length is far from the reference. Soft warning only — it does not add error points.",
+      `Length is ${a} words against a ${b}-word reference. Soft warning only. It adds no error points and it does not clear an omission.`,
     ];
   }
   return [];
+}
+
+function blocksAdvance(fired: FiredMark[]): boolean {
+  return fired.some((mark) => mark.category === "O" && mark.weight >= 8);
 }
 
 function avoidedOf(traps: Trap[], firedIds: Set<string>) {
@@ -287,6 +372,7 @@ export function gradeItem(
       points: 0,
       clean: true,
       perfect: true,
+      blocksAdvance: false,
       scaleLabel: scaleLabel(0),
       verdict: "Perfect",
       fired: [],
@@ -297,14 +383,24 @@ export function gradeItem(
   }
 
   const fired: FiredMark[] = [];
+  const micro = mode === "micro";
   if (useBuiltins) fired.push(...builtinMarks(text, mode === "passage" ? "passage" : "micro"));
 
   const blank = fired.some((f) => f.trapId === "builtin-blank");
   if (!blank) {
-    for (const trap of item.traps) {
+    if (micro) {
+      const major = majorOmissionMark(item.english, text, folded);
+      if (major) fired.push(major);
+    }
+    const ordered = [...item.traps].sort((a, b) => Number(a.category !== "O") - Number(b.category !== "O"));
+    for (const trap of ordered) {
       if (!detectorFires(trap, text, folded)) continue;
       const weight = chargeWeight(trap.category, trap.weightIfMissed);
       fired.push(markFrom(trap, trap.category, weight));
+    }
+    if (micro) {
+      const terminal = terminalPunctMark(item.english, text);
+      if (terminal) fired.push(terminal);
     }
   }
 
@@ -316,6 +412,7 @@ export function gradeItem(
     points,
     clean,
     perfect: false,
+    blocksAdvance: blocksAdvance(fired),
     scaleLabel: scaleLabel(points),
     verdict: verdictOf(false, clean, fired),
     fired,

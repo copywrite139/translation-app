@@ -15,7 +15,7 @@ import {
   weakestCategory,
   Ledger,
 } from "../lib/ledger";
-import { gradeItem, patternNote, GradeResult } from "../lib/scoring";
+import { gradeItem, patternNote, wordCount, GradeResult } from "../lib/scoring";
 import { ErrorCat } from "../lib/types";
 
 function one(value: string | string[] | undefined): string | undefined {
@@ -38,15 +38,16 @@ export default function Practice() {
   const [grade, setGrade] = useState<GradeResult | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [running, setRunning] = useState(0);
+  const [slots, setSlots] = useState<{ clean: boolean }[]>([]);
   const [finished, setFinished] = useState(false);
   const [left, setLeft] = useState<number | null>(null);
 
   const minutesQuery = one(router.query.minutes);
-  const minutes = minutesQuery ? Number(minutesQuery) : undefined;
   const countParam = one(router.query.count);
-  const count = countParam ? Number(countParam) : minutes && minutes <= 10 ? 5 : 8;
   const bank = one(router.query.bank);
   const itemId = one(router.query.item);
+  const minutes = minutesQuery ? Number(minutesQuery) : itemId ? undefined : bank ? 10 : 15;
+  const count = countParam ? Number(countParam) : minutes && minutes <= 10 ? 5 : 8;
 
   const queue = useMemo(() => {
     if (!router.isReady || !ledger) return [];
@@ -77,6 +78,7 @@ export default function Practice() {
     setGrade(null);
     setNote(null);
     setRunning(0);
+    setSlots([]);
     setFinished(false);
     setLeft(minutes ? Math.max(1, minutes) * 60 : null);
   }, [router.isReady, bank, count, itemId, minutes]);
@@ -90,6 +92,10 @@ export default function Practice() {
   }, [left === null, finished]);
 
   const current = queue[index];
+  const completed = slots.length;
+  const correct = slots.filter((slot) => slot.clean).length;
+  const accuracy = completed > 0 ? Math.round((correct / completed) * 100) : 0;
+  const advanceLocked = !!grade?.blocksAdvance;
 
   const analyze = () => {
     if (!current || !ledger) return;
@@ -123,7 +129,8 @@ export default function Practice() {
   };
 
   const goNext = () => {
-    if (!grade) return;
+    if (!grade || grade.blocksAdvance) return;
+    setSlots((prev) => [...prev, { clean: grade.clean }]);
     persist(grade);
     const nextRunning = running + grade.points;
     setRunning(nextRunning);
@@ -210,7 +217,13 @@ export default function Practice() {
           <br />
           {left === null ? "—" : left === 0 ? "Time is up" : formatClock(left)}
         </div>
+        <div>
+          <strong>Accuracy</strong>
+          <br />
+          {completed > 0 ? `${accuracy}% (${correct}/${completed})` : "—"}
+        </div>
       </div>
+      {left === 0 ? <p>Time is up. Grade what is in the box, or move on only if there is no major omission.</p> : null}
       <PassLineMeter points={running + (grade?.points || 0)} />
 
       {finished ? (
@@ -241,6 +254,9 @@ export default function Practice() {
           </div>
           <label style={{ display: "block", fontWeight: "bold", marginBottom: "0.4rem" }}>Your translation</label>
           <ExamTextarea value={text} onChange={setText} disabled={!!grade} rows={5} />
+          <div style={{ marginTop: "0.4rem", color: "#444", fontSize: "14px" }}>
+            Words: {wordCount(text)} · reference {wordCount(current.english)}. Over twice the reference, or under half, is a soft warning only.
+          </div>
           <AllowList />
 
           {grade ? (
@@ -264,8 +280,12 @@ export default function Practice() {
               </button>
             ) : (
               <>
-                <button onClick={goNext} style={button("#28a745")}>
-                  {index < queue.length - 1 ? "Save and next" : "Save and finish"}
+                <button onClick={goNext} disabled={advanceLocked} style={button(advanceLocked ? "#6c757d" : "#28a745")}>
+                  {advanceLocked
+                    ? "Omission — fix before next"
+                    : index < queue.length - 1
+                      ? "Save and next"
+                      : "Save and finish"}
                 </button>
                 <button
                   onClick={() => {
