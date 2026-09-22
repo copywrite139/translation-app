@@ -74,6 +74,7 @@ export default function Home() {
       </section>
 
       <section style={{ marginTop: "1.2rem", display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+        <Link href="/practice">Practice</Link>
         <Link href="/practice?bank=P&minutes=10">10-minute P micro</Link>
         <Link href="/practice?bank=O&minutes=10">10-minute O micro</Link>
         <Link href="/practice?bank=POS&minutes=10&item=pos-compromiso">POS: compromiso</Link>

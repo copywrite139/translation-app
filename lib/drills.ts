@@ -2879,6 +2879,13 @@ export function getMicro(id: string): DrillItem | undefined {
   return MICROS.find((m) => m.id === id);
 }
 
+/** The 15 sentences that already ship on /practice, in their original order. */
+export function corePractice(): DrillItem[] {
+  return ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
+    .map((id) => getMicro(id))
+    .filter((item): item is DrillItem => !!item);
+}
+
 const BANK_FOR_CATEGORY: Partial<Record<ErrorCat, Bank>> = {
   O: "O",
   P: "P",

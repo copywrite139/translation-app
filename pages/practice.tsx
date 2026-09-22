@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AllowList, ExamTextarea } from "../components/ExamEditor";
 import { MicroGrade, PassLineMeter, ScaleLegend } from "../components/GradePanel";
-import { MICROS, selectMicros } from "../lib/drills";
+import { corePractice, MICROS, selectMicros } from "../lib/drills";
 import {
   allMarks,
   dayKey,
@@ -41,14 +41,16 @@ export default function Practice() {
   const [finished, setFinished] = useState(false);
   const [left, setLeft] = useState<number | null>(null);
 
-  const minutes = Number(one(router.query.minutes) || 10);
+  const minutesQuery = one(router.query.minutes);
+  const minutes = minutesQuery ? Number(minutesQuery) : undefined;
   const countParam = one(router.query.count);
-  const count = countParam ? Number(countParam) : minutes <= 10 ? 5 : 8;
-  const bank = one(router.query.bank) || "P";
+  const count = countParam ? Number(countParam) : minutes && minutes <= 10 ? 5 : 8;
+  const bank = one(router.query.bank);
   const itemId = one(router.query.item);
 
   const queue = useMemo(() => {
     if (!router.isReady || !ledger) return [];
+    if (!bank && !itemId) return corePractice();
     const today = todayMarks(ledger, new Date());
     return selectMicros({
       bank,
@@ -76,7 +78,7 @@ export default function Practice() {
     setNote(null);
     setRunning(0);
     setFinished(false);
-    setLeft(Math.max(1, minutes) * 60);
+    setLeft(minutes ? Math.max(1, minutes) * 60 : null);
   }, [router.isReady, bank, count, itemId, minutes]);
 
   useEffect(() => {
@@ -135,8 +137,9 @@ export default function Practice() {
     setNote(null);
   };
 
-  const title =
-    bank === "P"
+  const title = !bank
+    ? "Capitalization, punctuation, and formatting"
+    : bank === "P"
       ? "P micro-drill"
       : bank === "O"
         ? "O micro-drill"
@@ -155,12 +158,20 @@ export default function Practice() {
       <h1>Professional Translation Practice</h1>
       <h2>
         {title}
-        {itemId ? "" : ` · ${minutes} min`}
+        {minutes ? ` · ${minutes} min` : ""}
       </h2>
       <p>
-        <Link href="/">Home</Link>
+        <Link href="/practice">The 15</Link>
         {" · "}
-        <Link href="/passage?minutes=90">90-minute passage</Link>
+        <Link href="/practice?bank=P&minutes=10">10-min P</Link>
+        {" · "}
+        <Link href="/practice?bank=O&minutes=10">10-min O</Link>
+        {" · "}
+        <Link href="/practice?bank=POS&minutes=10">POS</Link>
+        {" · "}
+        <Link href="/passage?minutes=90">90-min passage</Link>
+        {" · "}
+        <Link href="/">Today</Link>
       </p>
 
       <div
