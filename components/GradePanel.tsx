@@ -1,7 +1,15 @@
-import { describeMark, microHeadline, PassageGrade, GradeResult } from "../lib/scoring";
-import { CATEGORIES, CATEGORY_NAME, PASS_LINE } from "../lib/types";
+import { AskWhy } from "./AskWhy";
+import { describeMark, microHeadline, PassageGrade, GradeResult, FiredMark } from "../lib/scoring";
+import { CATEGORIES, CATEGORY_NAME, PASS_LINE, Trap } from "../lib/types";
 
-export function MicroGrade(props: { grade: GradeResult; patternNote?: string | null }) {
+export type AskContext = {
+  spanish: string;
+  candidate: string;
+  reference?: string;
+  traps: Trap[];
+};
+
+export function MicroGrade(props: { grade: GradeResult; patternNote?: string | null; ask?: AskContext }) {
   const { grade } = props;
   const bad = !grade.clean;
   return (
@@ -29,7 +37,7 @@ export function MicroGrade(props: { grade: GradeResult; patternNote?: string | n
           <div style={{ marginTop: "0.35rem" }}>Passage scale for a clean item: {grade.scaleLabel}</div>
         )}
       </div>
-      <TrapLists grade={grade} />
+      <TrapLists grade={grade} ask={props.ask} />
       {props.patternNote ? (
         <p style={{ padding: "0.8rem 1rem", background: "#f8e8e8", borderRadius: "8px" }}>
           <strong>Pattern.</strong> {props.patternNote}
@@ -44,7 +52,14 @@ export function MicroGrade(props: { grade: GradeResult; patternNote?: string | n
   );
 }
 
-export function PassageGradeView(props: { grade: PassageGrade }) {
+export type PassageAsk = {
+  source: string;
+  candidate: string;
+  reference?: string;
+  sentences: { id: string; traps: Trap[]; candidate: string }[];
+};
+
+export function PassageGradeView(props: { grade: PassageGrade; ask?: PassageAsk }) {
   const { grade } = props;
   const over = grade.points >= 18;
   return (
@@ -76,11 +91,25 @@ export function PassageGradeView(props: { grade: PassageGrade }) {
             {i + 1}. {s.grade.clean ? "Clean" : s.grade.verdict} · {s.grade.points} pts
           </strong>
           <div style={{ color: "#333", marginTop: "0.25rem" }}>{s.spanish}</div>
-          {s.grade.fired.map((f) => (
-            <div key={f.trapId} style={{ marginTop: "0.35rem" }}>
-              {describeMark(f)}
-            </div>
-          ))}
+          {s.grade.fired.map((f) => {
+            const sentence = props.ask?.sentences.find((row) => row.id === s.id);
+            return (
+              <div key={f.trapId} style={{ marginTop: "0.35rem" }}>
+                {describeMark(f)}
+                {sentence ? (
+                  <AskWhy
+                    mark={f}
+                    spanish={s.spanish}
+                    candidate={sentence.candidate}
+                    reference={s.english}
+                    traps={sentence.traps}
+                    fired={s.grade.fired}
+                    displayedPoints={s.grade.points}
+                  />
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       ))}
       {grade.fired.filter((f) => f.builtin).length ? (
@@ -89,7 +118,20 @@ export function PassageGradeView(props: { grade: PassageGrade }) {
           {grade.fired
             .filter((f) => f.builtin)
             .map((f) => (
-              <p key={f.trapId}>{describeMark(f)}</p>
+              <div key={f.trapId} style={{ marginTop: "0.35rem" }}>
+                <div>{describeMark(f)}</div>
+                {props.ask ? (
+                  <AskWhy
+                    mark={f}
+                    spanish={props.ask.source}
+                    candidate={props.ask.candidate}
+                    reference={props.ask.reference}
+                    traps={props.ask.sentences.flatMap((row) => row.traps)}
+                    fired={grade.fired}
+                    displayedPoints={grade.points}
+                  />
+                ) : null}
+              </div>
             ))}
         </>
       ) : null}
@@ -105,22 +147,16 @@ export function PassageGradeView(props: { grade: PassageGrade }) {
   );
 }
 
-function TrapLists(props: { grade: GradeResult }) {
+function TrapLists(props: { grade: GradeResult; ask?: AskContext }) {
   const missed = props.grade.fired;
   const caught = props.grade.avoided;
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem", marginBottom: "1rem" }}>
       <div>
         <strong>Trap missed</strong>
         {missed.length === 0 ? <div>None.</div> : null}
         {missed.map((f) => (
-          <div key={f.trapId} style={{ marginTop: "0.55rem" }}>
-            <div>
-              <strong>{f.code}</strong> {f.label}
-            </div>
-            <div>{describeMark(f)}</div>
-            <div style={{ color: "#555" }}>Pass {f.pass === "A" ? "A (English only)" : "B (source vs target)"}</div>
-          </div>
+          <FiredTrap key={f.trapId} mark={f} grade={props.grade} ask={props.ask} />
         ))}
       </div>
       <div>
@@ -138,7 +174,31 @@ function TrapLists(props: { grade: GradeResult }) {
   );
 }
 
-export function Histogram(props: { points: Record<string, number> }) {
+export function FiredTrap(props: { mark: FiredMark; grade: GradeResult; ask?: AskContext }) {
+  const { mark } = props;
+  return (
+    <div style={{ marginTop: "0.55rem" }}>
+      <div>
+        <strong>{mark.code}</strong> {mark.label}
+      </div>
+      <div>{describeMark(mark)}</div>
+      <div style={{ color: "#555" }}>Pass {mark.pass === "A" ? "A (English only)" : "B (source vs target)"}</div>
+      {props.ask ? (
+        <AskWhy
+          mark={mark}
+          spanish={props.ask.spanish}
+          candidate={props.ask.candidate}
+          reference={props.ask.reference}
+          traps={props.ask.traps}
+          fired={props.grade.fired}
+          displayedPoints={props.grade.points}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function Histogram(props: { points: Record<string, number> }) {
   const rows = CATEGORIES.filter((c) => props.points[c] > 0);
   if (!rows.length) return <p>No category points.</p>;
   return (

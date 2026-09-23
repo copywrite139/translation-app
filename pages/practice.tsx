@@ -261,7 +261,16 @@ export default function Practice() {
 
           {grade ? (
             <div style={{ marginTop: "1.2rem" }}>
-              <MicroGrade grade={grade} patternNote={note} />
+              <MicroGrade
+                grade={grade}
+                patternNote={note}
+                ask={{
+                  spanish: current.spanish,
+                  candidate: text,
+                  reference: current.english,
+                  traps: current.traps,
+                }}
+              />
               <div style={{ marginTop: "0.8rem", padding: "1rem", background: "#e8f6ee", borderRadius: "8px" }}>
                 <strong>Reference</strong>
                 <div style={{ fontSize: "18px", marginTop: "0.3rem" }}>{current.english}</div>
