@@ -251,6 +251,45 @@ function iegsLine(trap: AskTrap, didFire: boolean): string {
   return `IEGS/ATA: ${trap.code} ${verb} ${name}, weight ${trap.weight}, because ${angle(trap)} (${pass}).`;
 }
 
+/** Locator for the printed PDF. Category names come from the app. No page numbers are stored. */
+function standardsPointer(trap: AskTrap): string {
+  const name = CATEGORY_NAME[trap.category];
+  const pass = trap.pass === "A" ? "Pass A (English only)" : "Pass B (source vs target)";
+  const label = (trap.pitfall || "").replace(/[.!?]/g, "").trim();
+  const labelBit = label ? `, label "${label}"` : "";
+  return `Standards pointer: printed ATA Into-English grading standards, error category ${name} (${trap.category}), ${pass}${labelBit} (no page number stored).`;
+}
+
+function asksWhere(question: string): boolean {
+  return /where\b|grading standards|into[-\s]?english|reference point|printed pdf|\bpdf\b/i.test(question);
+}
+
+function asksCompare(question: string): boolean {
+  return /\bwhy\b[\s\S]{0,220}\bnot\b/i.test(question) && !asksWhyQuiet(question);
+}
+
+function categoryFromPhrase(phrase: string): ErrorCat | null {
+  const text = phrase.trim().toLowerCase();
+  if (!text) return null;
+  for (const category of CATEGORIES) {
+    const name = CATEGORY_NAME[category].toLowerCase();
+    if (text === name || text.includes(name)) return category;
+  }
+  return null;
+}
+
+function splitCompare(question: string): { left: string; right: string } | null {
+  const match = question.match(/\bwhy\b([\s\S]+?)\bnot\b([\s\S]+)/i);
+  if (!match) return null;
+  const left = match[1]
+    .replace(/^(?:\s*(?:is|it|this|that|the|a|an|mark|code)\b)+/i, "")
+    .replace(/\s+\band\s*$/i, "")
+    .trim();
+  const right = match[2].replace(/[?!.]+$/g, "").trim();
+  if (!left || !right) return null;
+  return { left, right };
+}
+
 function spanishJob(trap: AskTrap): string {
   if (trap.detector?.kind === "pos_job") {
     const bits = splitSentences(trap.comment);
@@ -283,8 +322,100 @@ function explainFired(trap: AskTrap, req: AskWhyRequest, didFire: boolean): stri
     wrote ? `What you wrote: ${quote(wrote.replace(/[.!?…]+$/u, "").trim())}.` : "What you wrote: the box is blank.",
     allows,
     `${iegsLine(trap, didFire)} ${scoreSentence(req.displayedPoints)}`,
+    standardsPointer(trap),
     fix ? `One clean fix: ${ensurePeriod(fix)}` : "One clean fix: the armed trap stores no model fragment, so change only the wording that note names.",
   ].join("\n\n");
+}
+
+function explainWhere(trap: AskTrap, req: AskWhyRequest): string {
+  const fix = cleanFix(trap, req.reference);
+  return [
+    standardsPointer(trap),
+    `Open that heading for ${trap.code}. ${ensurePeriod(capitalize(angle(trap)))}`,
+    spanishJob(trap),
+    fix ? `One clean fix: ${ensurePeriod(fix)}` : "",
+    scoreSentence(req.displayedPoints),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function explainCompare(anchor: AskTrap, req: AskWhyRequest, pointerFirst: boolean): string {
+  const parts = splitCompare(req.userQuestion);
+  const left = parts?.left ?? "";
+  const right = parts?.right ?? "";
+  const rightCat = categoryFromPhrase(right);
+  const leftCat = categoryFromPhrase(left);
+  const otherCat = rightCat && rightCat !== anchor.category ? rightCat : leftCat && leftCat !== anchor.category ? leftCat : null;
+  const lines: string[] = [];
+
+  if (anchor.detector?.kind === "pos_job") {
+    const rejectHit = anchor.detector.reject.find((word) => left.toLowerCase().includes(word.toLowerCase()));
+    const acceptHit = anchor.detector.accept.find((word) => right.toLowerCase().includes(word.toLowerCase()));
+    if (rejectHit && acceptHit) {
+      lines.push(
+        `It is ${quote(rejectHit)}, not ${quote(acceptHit)}, because ${acceptHit} keeps the ${jobName(anchor.detector.job)} and ${rejectHit} changes that job.`,
+        `That mark is ${anchor.code} ${CATEGORY_NAME[anchor.category]}, not a style preference.`
+      );
+    }
+  }
+
+  if (!lines.length && /style|stylistic|preference|fluency/i.test(right)) {
+    lines.push(`It is ${anchor.code} ${CATEGORY_NAME[anchor.category]}, not a style preference, because ${angle(anchor)}.`);
+  }
+
+  const rightCodes = codesIn(right);
+  if (!lines.length && rightCodes.length) {
+    const known = req.armedTraps.filter((trap) => rightCodes.includes(trap.code));
+    const unknown = rightCodes.filter((code) => !req.armedTraps.some((trap) => trap.code === code));
+    if (unknown.length && !known.length) {
+      lines.push(`${unknown.join(" and ")} is not on the armed list for this item, so I will not add that mark.`);
+      lines.push(`What fired is ${anchor.code} ${CATEGORY_NAME[anchor.category]}.`);
+    } else if (known.some((trap) => !trap.fired)) {
+      const quiet = known.filter((trap) => !trap.fired).slice(0, 2);
+      lines.push(`It is ${anchor.code} ${CATEGORY_NAME[anchor.category]}, not ${quiet.map((trap) => trap.code).join(" or ")}.`);
+      lines.push(
+        `${quiet.map((trap) => trap.code).join(" and ")} was armed and did not fire. ${quiet
+          .map((trap) => `${trap.code} (${trap.label}): ${ruleOf(trap)}`)
+          .join(". ")}.`
+      );
+    }
+  }
+
+  if (!lines.length && otherCat) {
+    const named = CATEGORY_NAME[otherCat];
+    const inList = req.armedTraps.filter((trap) => trap.category === otherCat);
+    const quiet = inList.filter((trap) => !trap.fired).slice(0, 2);
+    if (!inList.length) {
+      lines.push(`${named} (${otherCat}) is not on the armed list for this item, so I will not add it.`);
+      lines.push(`What fired is ${anchor.code} ${CATEGORY_NAME[anchor.category]}.`);
+    } else if (quiet.length) {
+      lines.push(`It is ${anchor.code} ${CATEGORY_NAME[anchor.category]}, not ${named}, because ${angle(anchor)}.`);
+      lines.push(
+        `${named} was armed and did not fire. ${quiet.map((trap) => `${trap.code} (${trap.label}): ${ruleOf(trap)}`).join(". ")}.`
+      );
+    } else {
+      lines.push(`${named} also fired on this item. This row is ${anchor.code} ${CATEGORY_NAME[anchor.category]}.`);
+    }
+  }
+
+  if (!lines.length) {
+    const other = right.replace(/[.!?]/g, "").trim();
+    lines.push(
+      other
+        ? `It is ${anchor.code} ${CATEGORY_NAME[anchor.category]}. "${other}" is not an armed category here, so I will not add it.`
+        : `It is ${anchor.code} ${CATEGORY_NAME[anchor.category]}.`
+    );
+    lines.push(spanishJob(anchor));
+  }
+
+  lines.push(standardsPointer(anchor), scoreSentence(req.displayedPoints));
+  if (pointerFirst) {
+    const pointer = lines.filter((line) => line.startsWith("Standards pointer"));
+    const rest = lines.filter((line) => !line.startsWith("Standards pointer"));
+    return [...pointer, ...rest].join("\n\n");
+  }
+  return lines.join("\n\n");
 }
 
 function ruleOf(trap: AskTrap): string {
@@ -319,7 +450,10 @@ function explainQuiet(traps: AskTrap[], req: AskWhyRequest): string {
       ? `${shown[0].code} (${shown[0].label}) was armed and did not fire. ${ensurePeriod(capitalize(ruleOf(shown[0])))}`
       : `These armed traps did not fire. ${shown.map((trap) => `${trap.code} (${trap.label}): ${ruleOf(trap)}`).join(". ")}.`;
   const extra = traps.length > 3 ? ` ${traps.length - 3} other armed traps also stayed quiet.` : "";
-  return [lead + extra, firedBit, scoreSentence(req.displayedPoints)].join("\n\n");
+  const firedTrap = req.armedTraps.find((trap) => trap.fired);
+  return [lead + extra, firedBit, firedTrap ? standardsPointer(firedTrap) : "", scoreSentence(req.displayedPoints)]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 function explainUnarmed(codes: string[], req: AskWhyRequest): string {
@@ -334,6 +468,7 @@ function explainUnarmed(codes: string[], req: AskWhyRequest): string {
   return [
     `${asked} is not on the armed list for this item, so I will not add that mark.`,
     `Armed codes here: ${armedCodes.join(", ") || "none"}.`,
+    standardsPointer(req.trap),
     scoreSentence(req.displayedPoints),
   ].join("\n\n");
 }
@@ -407,6 +542,28 @@ function compose(req: AskWhyRequest): string {
   const anchor = req.armedTraps.find((trap) => trap.trapId === req.trap.trapId) || req.trap;
   const choice = selectTraps(req);
   const whyQuiet = asksWhyQuiet(req.userQuestion);
+  const where = asksWhere(req.userQuestion);
+  const compare = asksCompare(req.userQuestion);
+
+  if (!whyQuiet && compare) return explainCompare(anchor, req, where);
+
+  if (!whyQuiet && where) {
+    if (choice.kind === "unarmed") return explainUnarmed(choice.codes, req);
+    if (choice.kind === "traps") {
+      const fired = choice.traps.find((trap) => trap.fired);
+      if (fired) return explainWhere(fired, req);
+      const quiet = choice.traps.filter((trap) => !trap.fired).slice(0, 2);
+      if (quiet.length) {
+        return [
+          standardsPointer(quiet[0]),
+          `${quiet.map((trap) => `${trap.code} (${trap.label})`).join(" and ")} was armed and did not fire.`,
+          `The fired mark on this row is ${anchor.code}. ${standardsPointer(anchor)}`,
+          scoreSentence(req.displayedPoints),
+        ].join("\n\n");
+      }
+    }
+    return explainWhere(anchor, req);
+  }
 
   if (choice.kind === "unarmed") return explainUnarmed(choice.codes, req);
 

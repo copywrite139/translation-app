@@ -73,7 +73,7 @@ export function AskWhy(props: {
       {open ? (
         <div style={panel}>
           <div style={{ fontSize: "13px", color: "#444", marginBottom: "0.45rem" }}>
-            Text only, on {props.mark.code}. This does not change the score. A follow-up such as “why didn’t X fire?” stays on the armed list.
+            Text only, on {props.mark.code}. This does not change the score. Ask in your own words, for example “why is it X and not Y?” or where to find it in the printed ATA Into-English standards.
           </div>
           <form
             onSubmit={(event) => {

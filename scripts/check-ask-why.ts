@@ -47,6 +47,10 @@ for (const preset of ASK_PRESETS) {
   if (!answer.includes("Committed to life")) fail(`${preset} missed the candidate`);
   if (!answer.includes("A commitment to life")) fail(`${preset} missed the clean fix`);
   if (!answer.includes("T4")) fail(`${preset} missed T4`);
+  if (!/Standards pointer: printed ATA Into-English grading standards, error category Transfer \(T\)/.test(answer)) {
+    fail(`${preset} missed the standards pointer`);
+  }
+  if (/\b(?:page|section|p\.)\s*\d+/i.test(answer)) fail(`${preset} invented a PDF locator`);
   if (!/does not change the 4 error points already shown/.test(answer)) fail(`${preset} restated the score wrong`);
   if (/certainly/i.test(answer)) fail(`${preset} used Certainly`);
   if (/\b(regrade|rescore|should be)\b/i.test(answer)) fail(`${preset} tried to rescore`);
@@ -54,6 +58,35 @@ for (const preset of ASK_PRESETS) {
   if (stray.length) fail(`${preset} invented ${stray.join(",")}`);
   console.log(`\n--- ${preset} (${sentences.length}) ---\n${answer}`);
 }
+
+function assertGrounded(label: string, answer: string) {
+  const sentences = sentencesOf(answer);
+  if (sentences.length < 4 || sentences.length > 8) fail(`${label} sentence count ${sentences.length}: ${answer}`);
+  if (/\b(?:page|section|p\.)\s*\d+/i.test(answer)) fail(`${label} invented a PDF locator:\n${answer}`);
+  if (/certainly/i.test(answer)) fail(`${label} used Certainly`);
+  if (/\b(regrade|rescore|should be)\b/i.test(answer)) fail(`${label} tried to rescore`);
+  if (!/does not change the 4 error points already shown/.test(answer)) fail(`${label} changed the score story`);
+  const stray = codesIn(answer).filter((code) => !armed.some((row) => row.code === code) && !codesIn(label).includes(code));
+  if (stray.length) fail(`${label} invented ${stray.join(",")}`);
+  console.log(`\n--- ${label} (${sentences.length}) ---\n${answer}`);
+}
+
+const compared = ask("But why is it Transfer and not Omission?");
+assertGrounded("why Transfer not Omission", compared);
+if (!/not Omission/.test(compared)) fail(`compare missed the contrast:\n${compared}`);
+if (!/did not fire/.test(compared)) fail(`compare missed the quiet omission:\n${compared}`);
+if (!/commitment, committed/.test(compared)) fail(`compare missed the armed omission rule:\n${compared}`);
+if (!/Standards pointer: printed ATA Into-English grading standards, error category Transfer \(T\)/.test(compared)) {
+  fail(`compare missed the standards pointer:\n${compared}`);
+}
+if (!/POS drift on noun heads/.test(compared)) fail(`compare missed the trap label:\n${compared}`);
+
+const where = ask("Where do I find this reference point in the ATA Into English grading standards?");
+assertGrounded("where in the standards", where);
+if (!where.startsWith("Standards pointer:")) fail(`where answer did not lead with the pointer:\n${where}`);
+if (!/error category Transfer \(T\)/.test(where)) fail(`where answer missed Transfer (T):\n${where}`);
+if (!/no page number stored/.test(where)) fail(`where answer implied a page:\n${where}`);
+if (!/Open that heading for T4/.test(where)) fail(`where answer missed the code heading:\n${where}`);
 
 const quiet = ask("Why didn't the omission fire?");
 if (!/did not fire/.test(quiet)) fail(`quiet answer missed the armed omission:\n${quiet}`);
