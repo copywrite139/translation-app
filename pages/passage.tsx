@@ -52,6 +52,7 @@ export default function PassagePage() {
   const [sourceHidden, setSourceHidden] = useState(proofRequested);
   const [checks, setChecks] = useState<boolean[]>(CHECKS.map(() => false));
   const [grade, setGrade] = useState<PassageGrade | null>(null);
+  const [gradedText, setGradedText] = useState("");
   const [ledger, setLedger] = useState<Ledger | null>(null);
   const [startedAt, setStartedAt] = useState<number>(Date.now());
 
@@ -113,6 +114,7 @@ export default function PassagePage() {
     const result = gradePassage(view, text);
     const prior = ledger ? allMarks(ledger) : [];
     result.patternNote = patternNote(result.fired, prior);
+    setGradedText(text);
     setGrade(result);
     if (ledger) {
       const next = recordEvent(ledger, {
@@ -244,7 +246,10 @@ export default function PassagePage() {
 
       {grade ? (
         <div style={{ marginTop: "1.2rem" }}>
-          <PassageGradeView grade={grade} />
+          <PassageGradeView
+            grade={grade}
+            ask={passageAsk(source, gradedText, sentences)}
+          />
           <p>
             Saved to the ledger. <Link href="/practice?bank=today&minutes=10&count=3">Three micros on these traps</Link>
           </p>
@@ -253,6 +258,25 @@ export default function PassagePage() {
       <ScaleLegend />
     </div>
   );
+}
+
+function passageAsk(
+  source: string,
+  gradedText: string,
+  sentences: { id: string; english: string; traps: (typeof PASSAGE.sentences)[number]["traps"] }[]
+) {
+  const parts = splitEnglishSentences(gradedText);
+  const aligned = parts.length === sentences.length;
+  return {
+    source,
+    candidate: gradedText,
+    reference: sentences.map((s) => s.english).join(" "),
+    sentences: sentences.map((s, i) => ({
+      id: s.id,
+      traps: s.traps,
+      candidate: aligned ? parts[i] : gradedText,
+    })),
+  };
 }
 
 const smallButton = {
