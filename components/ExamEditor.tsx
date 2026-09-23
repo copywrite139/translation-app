@@ -14,8 +14,8 @@ const box: CSSProperties = {
 
 function lockExamBox(el: HTMLTextAreaElement | null) {
   if (!el) return;
-  el.spellcheck = false;
-  el.setAttribute("spellcheck", "false");
+  el.spellcheck = true;
+  el.setAttribute("spellcheck", "true");
   el.setAttribute("autocorrect", "off");
   el.setAttribute("autocapitalize", "none");
   el.setAttribute("autocomplete", "off");
@@ -41,7 +41,7 @@ export function ExamTextarea(props: {
       onFocus={(e) => lockExamBox(e.currentTarget)}
       disabled={props.disabled}
       rows={props.rows ?? 8}
-      spellCheck={false}
+      spellCheck={true}
       autoCorrect="off"
       autoCapitalize="off"
       autoComplete="off"
@@ -51,7 +51,7 @@ export function ExamTextarea(props: {
       data-lt-active="false"
       lang="en"
       style={box}
-      placeholder={props.placeholder ?? "US English. One plain box. No spell-check."}
+      placeholder={props.placeholder ?? "US English. One plain box."}
       aria-label="Exam translation"
     />
   );
@@ -70,7 +70,7 @@ export function AllowList() {
         lineHeight: 1.45,
       }}
     >
-      <strong>Exam box.</strong> No spell-check, no machine translation, no AI rewrite, no CAT. Lookups, if you leave this page, stay on the allow-list: Google or Yahoo spelling and usage search, WordReference (no forums), Merriam-Webster, American Heritage, DLE, DPD, Linguee, IEGS, Google Ngram. This panel does not link out.
+      <strong>Exam box.</strong> Browser spell-check is on. No machine translation, no AI rewrite, no CAT. Lookups, if you leave this page, stay on the allow-list: Google or Yahoo spelling and usage search, WordReference (no forums), Merriam-Webster, American Heritage, DLE, DPD, Linguee, IEGS, Google Ngram. This panel does not link out.
     </aside>
   );
 }

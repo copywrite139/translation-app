@@ -22,7 +22,12 @@ export function AskWhy(props: {
 
   async function submit(raw: string) {
     const userQuestion = raw.trim();
-    if (!userQuestion || busy) return;
+    if (busy) return;
+    if (!userQuestion) {
+      setError("Type a question, then Submit.");
+      document.getElementById(`ask-q-${props.mark.trapId}`)?.focus();
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -70,33 +75,37 @@ export function AskWhy(props: {
           <div style={{ fontSize: "13px", color: "#444", marginBottom: "0.45rem" }}>
             Text only, on {props.mark.code}. This does not change the score. A follow-up such as “why didn’t X fire?” stays on the armed list.
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", marginBottom: "0.45rem" }}>
-            {ASK_PRESETS.map((preset) => (
-              <button key={preset} type="button" onClick={() => submit(preset)} disabled={busy} style={chip}>
-                {preset}
-              </button>
-            ))}
-          </div>
           <form
             onSubmit={(event) => {
               event.preventDefault();
               submit(question);
             }}
           >
+            <label htmlFor={`ask-q-${props.mark.trapId}`} style={{ display: "block", fontWeight: "bold", marginBottom: "0.3rem" }}>
+              Ask a question
+            </label>
             <textarea
+              id={`ask-q-${props.mark.trapId}`}
               value={question}
               onChange={(event) => setQuestion(event.target.value)}
-              rows={2}
+              rows={3}
               maxLength={500}
               disabled={busy}
-              placeholder="Or ask in your own words"
-              aria-label={`Question about ${props.mark.code}`}
+              placeholder="Ask a question…"
+              aria-label="Ask a question"
               style={field}
             />
-            <button type="submit" disabled={busy || !question.trim()} style={submitButton(busy || !question.trim())}>
-              {busy ? "Asking…" : "Ask"}
+            <button type="submit" disabled={busy} style={submitButton(busy)}>
+              {busy ? "Asking…" : "Submit"}
             </button>
           </form>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", marginTop: "0.55rem" }}>
+            {ASK_PRESETS.map((preset) => (
+              <button key={preset} type="button" onClick={() => submit(preset)} disabled={busy} style={chip}>
+                {preset}
+              </button>
+            ))}
+          </div>
           {error ? <p style={{ color: "#8b1e1e", margin: "0.5rem 0 0" }}>{error}</p> : null}
           <div aria-live="polite">
             {turns.map((turn, index) => (
