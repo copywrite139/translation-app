@@ -16,7 +16,25 @@ import {
   Ledger,
 } from "../lib/ledger";
 import { gradeItem, patternNote, wordCount, GradeResult } from "../lib/scoring";
-import { ErrorCat } from "../lib/types";
+import { DrillItem, ErrorCat } from "../lib/types";
+
+const PRIVATE_LABEL = "Private · Ed only · friend extracts (micro)";
+
+const FOCUS_LABEL: Record<string, string> = {
+  "numbers-separators": "Numbers and separators",
+  "false-friends": "False friends",
+  "names-titles-acronyms": "Names, titles, acronyms",
+  "institutions-headlines": "Institutions and headlines",
+  "us-spelling": "US spelling",
+  "regional-lexicon": "Regional lexicon",
+  "quotes-asides": "Quotes and asides",
+  register: "Register",
+  "technical-precision": "Technical precision",
+  "source-defects": "Source defects",
+  "pos-syntax": "POS and syntax",
+};
+
+type PrivateAccess = "off" | "email" | "open";
 
 function one(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -41,16 +59,33 @@ export default function Practice() {
   const [slots, setSlots] = useState<{ clean: boolean }[]>([]);
   const [finished, setFinished] = useState(false);
   const [left, setLeft] = useState<number | null>(null);
+  const [privateItems, setPrivateItems] = useState<DrillItem[]>([]);
+  const [privateAccess, setPrivateAccess] = useState<PrivateAccess>("off");
+  const [unlockEmail, setUnlockEmail] = useState("");
+  const [unlockError, setUnlockError] = useState<string | null>(null);
 
   const minutesQuery = one(router.query.minutes);
   const countParam = one(router.query.count);
   const bank = one(router.query.bank);
   const itemId = one(router.query.item);
-  const minutes = minutesQuery ? Number(minutesQuery) : itemId ? undefined : bank ? 10 : 15;
+  const shape = one(router.query.shape);
+  const focus = one(router.query.focus);
+  const privateSession = bank === "private" || !!itemId?.startsWith("pmd-");
+  const minutes = minutesQuery ? Number(minutesQuery) : itemId || bank === "private" ? undefined : bank ? 10 : 15;
   const count = countParam ? Number(countParam) : minutes && minutes <= 10 ? 5 : 8;
 
   const queue = useMemo(() => {
     if (!router.isReady || !ledger) return [];
+    if (privateSession) {
+      let pool = privateItems.filter((item) => item.gated);
+      if (itemId) return pool.filter((item) => item.id === itemId);
+      if (shape === "sentence" || shape === "short-paragraph") {
+        pool = pool.filter((item) => item.microShape === shape);
+      }
+      if (focus) pool = pool.filter((item) => item.focus.includes(focus));
+      if (countParam && Number.isFinite(count) && count > 0) pool = pool.slice(0, count);
+      return pool;
+    }
     if (!bank && !itemId) return corePractice();
     const today = todayMarks(ledger, new Date());
     return selectMicros({
@@ -64,11 +99,52 @@ export default function Practice() {
       todayLemmas: today.map((m) => m.lemma || ""),
       todayCategories: today.map((m) => m.category as ErrorCat),
     });
-  }, [router.isReady, ledger, bank, count, itemId]);
+  }, [router.isReady, ledger, bank, count, countParam, itemId, privateSession, privateItems, shape, focus]);
 
   useEffect(() => {
     setLedger(loadLedger());
   }, []);
+
+  const loadPrivate = () => {
+    fetch("/api/private-micros", { credentials: "same-origin", cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        const access = data?.access === "open" || data?.access === "email" ? data.access : "off";
+        setPrivateAccess(access);
+        setPrivateItems(access === "open" && Array.isArray(data.items) ? data.items : []);
+      })
+      .catch(() => {
+        setPrivateAccess("off");
+        setPrivateItems([]);
+      });
+  };
+
+  useEffect(() => {
+    loadPrivate();
+  }, []);
+
+  const unlockPrivate = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    setUnlockError(null);
+    fetch("/api/private-micros", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: unlockEmail }),
+    })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data?.access !== "open") {
+          setUnlockError(typeof data?.error === "string" ? data.error : "This email is not enabled for the private bank.");
+          setPrivateItems([]);
+          return;
+        }
+        setPrivateAccess("open");
+        setPrivateItems(Array.isArray(data.items) ? data.items : []);
+      })
+      .catch(() => setUnlockError("This email is not enabled for the private bank."));
+  };
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -81,7 +157,7 @@ export default function Practice() {
     setSlots([]);
     setFinished(false);
     setLeft(minutes ? Math.max(1, minutes) * 60 : null);
-  }, [router.isReady, bank, count, itemId, minutes]);
+  }, [router.isReady, bank, count, itemId, minutes, shape, focus, privateSession ? privateItems.length : 0]);
 
   useEffect(() => {
     if (left === null || finished) return;
@@ -144,7 +220,20 @@ export default function Practice() {
     setNote(null);
   };
 
-  const title = !bank
+  const privateTags = Array.from(new Set(privateItems.flatMap((item) => item.focus)));
+  const privateHref = (next: { shape?: string; focus?: string }) => {
+    const params = new URLSearchParams();
+    params.set("bank", "private");
+    const nextShape = next.shape === undefined ? shape : next.shape;
+    const nextFocus = next.focus === undefined ? focus : next.focus;
+    if (nextShape === "sentence" || nextShape === "short-paragraph") params.set("shape", nextShape);
+    if (nextFocus) params.set("focus", nextFocus);
+    return `/practice?${params.toString()}`;
+  };
+
+  const title = privateSession
+    ? PRIVATE_LABEL
+    : !bank
     ? "Capitalization, punctuation, and formatting"
     : bank === "P"
       ? "P micro-drill"
@@ -180,6 +269,56 @@ export default function Practice() {
         {" · "}
         <Link href="/">Today</Link>
       </p>
+      {privateAccess === "open" && privateItems.length ? (
+        <p>
+          <Link href="/practice?bank=private">{PRIVATE_LABEL}</Link>
+          {" · "}
+          <Link href={privateHref({ shape: "sentence", focus: focus || "" })}>Sentence</Link>
+          {" · "}
+          <Link href={privateHref({ shape: "short-paragraph", focus: focus || "" })}>Short paragraph</Link>
+          {privateSession ? (
+            <label style={{ marginLeft: "0.6rem" }}>
+              Focus{" "}
+              <select
+                value={focus || ""}
+                onChange={(event) => {
+                  router.push(privateHref({ focus: event.target.value }));
+                }}
+              >
+                <option value="">All traps</option>
+                {privateTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {FOCUS_LABEL[tag] || tag}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+        </p>
+      ) : null}
+      {privateAccess === "email" ? (
+        <form onSubmit={unlockPrivate} style={{ margin: "0 0 1rem", padding: "0.8rem 1rem", background: "#f4f4f4", borderRadius: "8px" }}>
+          <strong>Private practice</strong>
+          <p style={{ margin: "0.35rem 0" }}>
+            Enter the email in PRIVATE_FRIEND_MICROS_EMAIL. Nothing from that bank is listed until it matches.
+          </p>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <input
+              type="email"
+              name="email"
+              autoComplete="username"
+              required
+              value={unlockEmail}
+              onChange={(event) => setUnlockEmail(event.target.value)}
+              style={{ padding: "8px 10px", minWidth: "240px" }}
+            />
+            <button type="submit" style={button("#007bff")}>
+              Unlock
+            </button>
+          </div>
+          {unlockError ? <p style={{ color: "#a33", marginBottom: 0 }}>{unlockError}</p> : null}
+        </form>
+      ) : null}
 
       <div
         style={{
@@ -200,7 +339,9 @@ export default function Practice() {
         <div>
           <strong>Bank</strong>
           <br />
-          {current?.bank || bank}
+          {current?.gated
+            ? `Private · ${current.microShape === "short-paragraph" ? "short paragraph" : "sentence"}`
+            : current?.bank || bank || "—"}
         </div>
         <div>
           <strong>Domain</strong>
@@ -240,22 +381,48 @@ export default function Practice() {
           </p>
         </section>
       ) : !current ? (
-        <p>{ledger ? "No items in this bank yet." : "Loading the ledger…"}</p>
+        <p>
+          {!ledger
+            ? "Loading the ledger…"
+            : privateSession && privateAccess === "email"
+              ? "Private practice is locked."
+              : "No items in this bank yet."}
+        </p>
       ) : (
         <section style={{ border: "2px solid #ddd", padding: "1.5rem", borderRadius: "12px" }}>
           <div style={{ marginBottom: "1rem", padding: "1rem", backgroundColor: "#fff3cd", borderRadius: "6px" }}>
-            <strong>Focus:</strong> {current.focus.join(", ")}
+            <strong>Focus:</strong> {current.focus.map((tag) => FOCUS_LABEL[tag] || tag).join(", ")}
+            {current.microShape ? (
+              <>
+                <br />
+                <strong>Length:</strong> {current.microShape === "short-paragraph" ? "Short paragraph" : "Sentence"}
+              </>
+            ) : null}
+            {current.sourceLabel ? (
+              <>
+                <br />
+                <strong>Extract:</strong> {current.sourceLabel}
+              </>
+            ) : null}
             <br />
             <strong>Watch for:</strong> {current.errors_to_catch.join(" · ")}
+            {current.why ? (
+              <>
+                <br />
+                <strong>Why this chunk:</strong> {current.why}
+              </>
+            ) : null}
           </div>
           <div style={{ marginBottom: "1rem", padding: "1.2rem", backgroundColor: "#e8f4fd", borderRadius: "8px" }}>
             <strong>Spanish source</strong>
             <div style={{ fontSize: "18px", whiteSpace: "pre-wrap", marginTop: "0.4rem" }}>{current.spanish}</div>
           </div>
           <label style={{ display: "block", fontWeight: "bold", marginBottom: "0.4rem" }}>Your translation</label>
-          <ExamTextarea value={text} onChange={setText} disabled={!!grade} rows={5} />
+          <ExamTextarea value={text} onChange={setText} disabled={!!grade} rows={current.microShape === "short-paragraph" ? 8 : 5} />
           <div style={{ marginTop: "0.4rem", color: "#444", fontSize: "14px" }}>
-            Words: {wordCount(text)} · reference {wordCount(current.english)}. Over twice the reference, or under half, is a soft warning only.
+            {current.english
+              ? `Words: ${wordCount(text)} · reference ${wordCount(current.english)}. Over twice the reference, or under half, is a soft warning only.`
+              : `Words: ${wordCount(text)} · source ${wordCount(current.spanish)}. No exact-match key; traps score the rendering.`}
           </div>
           <AllowList />
 
@@ -267,14 +434,22 @@ export default function Practice() {
                 ask={{
                   spanish: current.spanish,
                   candidate: text,
-                  reference: current.english,
+                  reference: current.english || undefined,
                   traps: current.traps,
                 }}
               />
-              <div style={{ marginTop: "0.8rem", padding: "1rem", background: "#e8f6ee", borderRadius: "8px" }}>
-                <strong>Reference</strong>
-                <div style={{ fontSize: "18px", marginTop: "0.3rem" }}>{current.english}</div>
-              </div>
+              {current.coachHint ? (
+                <div style={{ marginTop: "0.8rem", padding: "1rem", background: "#e8f6ee", borderRadius: "8px" }}>
+                  <strong>Coach hint</strong>
+                  <div style={{ color: "#333", marginTop: "0.2rem" }}>Not a model key. The traps above scored the rendering.</div>
+                  <div style={{ fontSize: "18px", marginTop: "0.3rem" }}>{current.coachHint}</div>
+                </div>
+              ) : current.english ? (
+                <div style={{ marginTop: "0.8rem", padding: "1rem", background: "#e8f6ee", borderRadius: "8px" }}>
+                  <strong>Reference</strong>
+                  <div style={{ fontSize: "18px", marginTop: "0.3rem" }}>{current.english}</div>
+                </div>
+              ) : null}
             </div>
           ) : null}
 
@@ -312,7 +487,11 @@ export default function Practice() {
         </section>
       )}
       <ScaleLegend />
-      <p style={{ color: "#666", fontSize: "13px" }}>{MICROS.length} micros in the banks. Metadata is stored on each item.</p>
+      <p style={{ color: "#666", fontSize: "13px" }}>
+        {privateItems.length
+          ? `${MICROS.length} micros in the public banks. ${privateItems.length} private items on this browser.`
+          : `${MICROS.length} micros in the banks. Metadata is stored on each item.`}
+      </p>
     </div>
   );
 }
