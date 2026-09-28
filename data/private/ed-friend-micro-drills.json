@@ -1,0 +1,740 @@
+[
+  {
+    "id": "pmd-p01-01",
+    "source_passage": "passage-01-spinoza-peru",
+    "source_passage_label": "P1 Spinoza / Hope & Peruvian Optimism",
+    "spanish_text": "La esperanza, decía el filósofo judío-luso-holandés Baruch Spinoza, es uno de esos estados de ánimo volubles que proviene de la sensación de que algo bueno va a pasar. Entonces, la esperanza se alterna con el miedo a que nuestra ilusión no se realice.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "pos-syntax",
+      "false-friends"
+    ],
+    "errors_to_catch": [
+      "Baruch Spinoza kept; judío-luso-holandés → Jewish-Portuguese-Dutch (or equiv.)",
+      "proviene (sg.) agrees with uno…estado, not plural 'come'",
+      "ilusión ≈ hope/expectation, not optical illusion"
+    ],
+    "why_this_chunk": "Arms name transfer, antecedent agreement, and the classic ilusión false friend in two sentences.",
+    "suggested_ok_english_hint": "Hope, said the Jewish-Portuguese-Dutch philosopher Baruch Spinoza, is one of those fickle states of mind that comes/stems from… fear that our hopes/expectations will not be fulfilled.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 43
+  },
+  {
+    "id": "pmd-p01-02",
+    "source_passage": "passage-01-spinoza-peru",
+    "source_passage_label": "P1 Spinoza / Hope & Peruvian Optimism",
+    "spanish_text": "El optimista vive bajo la expectativa de que su esperanza se convierta en realidad. Y el pesimista siente que el desastre, temido y añorado, está por alcanzarlo.",
+    "focus_traps": [
+      "register",
+      "false-friends"
+    ],
+    "errors_to_catch": [
+      "añorado = longed for / yearned for (ironic), not 'nostalgic'",
+      "Keep both temido y añorado — dropping añorado = O",
+      "Formal essay register, not chatty"
+    ],
+    "why_this_chunk": "Short ironic collocation easy to soften or omit under time pressure.",
+    "suggested_ok_english_hint": "…the disaster he both fears and (secretly) longs for is about to reach him.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 27
+  },
+  {
+    "id": "pmd-p01-03",
+    "source_passage": "passage-01-spinoza-peru",
+    "source_passage_label": "P1 Spinoza / Hope & Peruvian Optimism",
+    "spanish_text": "Quizá el ejemplo más destacado de un pensador optimista sea José Faustino Sánchez Carrión, quien, en los albores de la emancipación, no se cansó de predicar que el Perú debería ser una república, pues cualquier otro régimen nos llevaría de vuelta a algún tipo de coloniaje.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "regional-lexicon",
+      "false-friends"
+    ],
+    "errors_to_catch": [
+      "José Faustino Sánchez Carrión — keep accents/form; no 'Joseph…'",
+      "emancipación / coloniaje → independence / colonial rule (not 'colonization')",
+      "régimen → form of government here, not 'diet'",
+      "Perú → Peru (no accent in EN)"
+    ],
+    "why_this_chunk": "Bundles a proper name with high-cost historical lexicon and régimen sense.",
+    "suggested_ok_english_hint": "…José Faustino Sánchez Carrión, who, at the dawn of independence, … any other regime would take us back to some form of colonial rule.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 46
+  },
+  {
+    "id": "pmd-p01-04",
+    "source_passage": "passage-01-spinoza-peru",
+    "source_passage_label": "P1 Spinoza / Hope & Peruvian Optimism",
+    "spanish_text": "Se instaló en las mentalidades colectivas la idea de que el Perú era un país irredento que aguardaba su salvación de manos de algún caudillo excepcional.",
+    "focus_traps": [
+      "regional-lexicon",
+      "register"
+    ],
+    "errors_to_catch": [
+      "irredento → unredeemed / irredentist sense — not calqued nonsense",
+      "caudillo → keep or 'strongman'; not 'cowboy'",
+      "Elevated essay tone"
+    ],
+    "why_this_chunk": "Single-sentence regional history lexicon trap (irredento + caudillo).",
+    "suggested_ok_english_hint": "…an unredeemed country awaiting salvation from some exceptional caudillo/strongman.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 26
+  },
+  {
+    "id": "pmd-p01-05",
+    "source_passage": "passage-01-spinoza-peru",
+    "source_passage_label": "P1 Spinoza / Hope & Peruvian Optimism",
+    "spanish_text": "No obstante, el nuevo Perú no ha hecho suya la sensación de impotencia y baja autoestima que tanto marcó a nuestro país en el pasado. Sigue existiendo un sano realismo en el pueblo que lo lleva a sentir que la lucha contra la corrupción y por la democracia es el único camino para salir adelante.",
+    "focus_traps": [
+      "register",
+      "names-titles-acronyms"
+    ],
+    "errors_to_catch": [
+      "Keep formal essay voice; don't chatty-fy",
+      "Perú → Peru; don't invent political spin",
+      "No content loss on 'sano realismo' / dual lucha"
+    ],
+    "why_this_chunk": "Closing register check: formal optimism without editorializing.",
+    "suggested_ok_english_hint": "Nevertheless, the new Peru has not adopted the sense of powerlessness… A healthy realism still exists among the people…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 55
+  },
+  {
+    "id": "pmd-p02-01",
+    "source_passage": "passage-02-defensa-argentina",
+    "source_passage_label": "P2 Defensa analiza los sueldos militares",
+    "spanish_text": "Buenos Aires, La Voz\n\nDefensa analiza los sueldos militares\n\nLa posibilidad de conceder una mejora real en las remuneraciones del personal militar está siendo analizada por el Ministerio de Defensa, que considera una propuesta de aumento del 15 por ciento por sobre la pauta salarial aprobada por el gobierno, según trascendió ayer de fuentes seguras, que puntualizaron que aún resta una definición sobre el tema.",
+    "focus_traps": [
+      "false-friends",
+      "numbers-separators",
+      "institutions-headlines"
+    ],
+    "errors_to_catch": [
+      "Defensa headline → Defense Ministry / Defense (not abstract 'Defense analyzes')",
+      "pauta salarial → wage/pay guideline (not 'salary pattern')",
+      "trascendió → was reported/emerged (not 'transcended')",
+      "fuentes seguras → reliable sources (not 'secure sources')",
+      "15 por ciento → 15 percent; US Defense spelling",
+      "Dateline: Buenos Aires, La Voz — keep outlet name"
+    ],
+    "why_this_chunk": "Lead packs false friends, US Defense, percent, and institutional headline shorthand.",
+    "suggested_ok_english_hint": "Defense Ministry reviewing a real pay raise… 15 percent above the government wage guideline, according to reliable sources…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 65
+  },
+  {
+    "id": "pmd-p02-02",
+    "source_passage": "passage-02-defensa-argentina",
+    "source_passage_label": "P2 Defensa analiza los sueldos militares",
+    "spanish_text": "Otro tema de constante análisis en el equipo que comanda el ministro Raúl Borrás, es el referente a la situación presupuestaria de las fuerzas dentro del marco de la severa limitación generalizada del gasto público, impuesta por el gobierno.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "register"
+    ],
+    "errors_to_catch": [
+      "Raúl Borrás — transfer name/accent consistently",
+      "News wire voice; no essay flourishes",
+      "Don't invent English ministry nickname"
+    ],
+    "why_this_chunk": "Name + news register in one mid-length sentence.",
+    "suggested_ok_english_hint": "Another constant topic for Minister Raúl Borrás's team is the forces' budget situation amid the government's severe across-the-board public spending limits.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 39
+  },
+  {
+    "id": "pmd-p02-03",
+    "source_passage": "passage-02-defensa-argentina",
+    "source_passage_label": "P2 Defensa analiza los sueldos militares",
+    "spanish_text": "Si bien no ha trascendido que las otras dos fuerzas consideren presentaciones similares, se sabe que en el Ejército se calcula que con las disponibilidades existentes para el año se cubriría sólo el 20 por ciento de los gastos necesarios.",
+    "focus_traps": [
+      "false-friends",
+      "numbers-separators",
+      "institutions-headlines"
+    ],
+    "errors_to_catch": [
+      "presentaciones → submissions/requests/filings (not PowerPoint 'presentations')",
+      "trascendido → reported/emerged again",
+      "20 por ciento → 20 percent; sólo = only",
+      "Ejército → Army (institutional)"
+    ],
+    "why_this_chunk": "presentaciones budget sense + percent + Army label.",
+    "suggested_ok_english_hint": "Although it has not emerged that the other two services are considering similar submissions… the Army calculates… only 20 percent of necessary expenses.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 40
+  },
+  {
+    "id": "pmd-p02-04",
+    "source_passage": "passage-02-defensa-argentina",
+    "source_passage_label": "P2 Defensa analiza los sueldos militares",
+    "spanish_text": "Asimismo, a través de un informe del Ministerio de Defensa se supo ayer que la deuda externa … ascendía al 31 de diciembre último a 3.801 millones de dólares.",
+    "focus_traps": [
+      "numbers-separators",
+      "quotes-asides",
+      "us-spelling"
+    ],
+    "errors_to_catch": [
+      "3.801 millones → 3,801 million (ES thousands '.' → EN ',')",
+      "31 de diciembre último → last December 31 / Dec. 31 of last year — do NOT invent a year",
+      "Ellipsis (…) — don't invent omitted text",
+      "Ministry of Defense (US spelling)"
+    ],
+    "why_this_chunk": "Classic separator + date + ellipsis omission magnet in one line.",
+    "suggested_ok_english_hint": "…external debt … stood at 3,801 million dollars as of last December 31.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 29
+  },
+  {
+    "id": "pmd-p02-05",
+    "source_passage": "passage-02-defensa-argentina",
+    "source_passage_label": "P2 Defensa analiza los sueldos militares",
+    "spanish_text": "También se sostiene en el trabajo que el presupuesto asignado, si no se efectúa la restructuración militar planificada este mismo año, implica que las Fuerzas Armadas “están sufriendo degradación en el entrenamiento y descapitalización en el equipamiento”. “Este nivel presupuestario permite apenas un funcionamiento mínimo por un tiempo limitado”, agregó el ministro y advirtió que “de repetirse la asignación de fondos sin cambiar la estructura, continuaría la degradación causando daños de creciente significación en la capacidad de defensa”.",
+    "focus_traps": [
+      "quotes-asides",
+      "institutions-headlines",
+      "register"
+    ],
+    "errors_to_catch": [
+      "Keep both quoted blocks + attribution (ministro)",
+      "Fuerzas Armadas → Armed Forces",
+      "Don't drop 'descapitalización en el equipamiento'",
+      "News register; nested quotes intact"
+    ],
+    "why_this_chunk": "Nested quote/omission drill — high O risk under time pressure.",
+    "suggested_ok_english_hint": "Preserve both FA quotes and the minister's follow-on warning about degradation of defense capability.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 78
+  },
+  {
+    "id": "pmd-p02-06",
+    "source_passage": "passage-02-defensa-argentina",
+    "source_passage_label": "P2 Defensa analiza los sueldos militares",
+    "spanish_text": "Afirmó luego que el presupuesto previsto alcanza al 3 por ciento del Producto Bruto Interno, frente al 2,7 por ciento del año pasado.",
+    "focus_traps": [
+      "numbers-separators",
+      "regional-lexicon",
+      "us-spelling"
+    ],
+    "errors_to_catch": [
+      "2,7 → 2.7 (ES decimal comma → EN period)",
+      "Producto Bruto Interno (AR) → GDP / gross domestic product — not PBI left raw",
+      "3 por ciento / 2.7 percent — consistent US 'percent'"
+    ],
+    "why_this_chunk": "Tiny sentence, two number traps + Argentine GDP label.",
+    "suggested_ok_english_hint": "…3 percent of GDP, compared with 2.7 percent last year.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 23
+  },
+  {
+    "id": "pmd-p03-01",
+    "source_passage": "passage-03-camote-ipn",
+    "source_passage_label": "P3 Harina de camote",
+    "spanish_text": "Harina de camote, alternativa nutricional para personas con regímenes especiales\n\nEl camote contiene grandes cantidades de fibra, carbohidratos y almidón y un bajo índice glucémico, es decir, que libera lentamente el azúcar en el torrente sanguíneo, lo que estabiliza la glucosa.",
+    "focus_traps": [
+      "regional-lexicon",
+      "technical-precision",
+      "us-spelling"
+    ],
+    "errors_to_catch": [
+      "camote → sweet potato (not yam; don't leave unglossed if sense needed)",
+      "índice glucémico → glycemic index (US spelling)",
+      "regímenes especiales → special/restricted diets (not bare 'regimes')"
+    ],
+    "why_this_chunk": "Title+lead: regional food + GI technical + régimen false friend.",
+    "suggested_ok_english_hint": "Sweet potato flour… for people on special diets. Sweet potato… low glycemic index…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 41
+  },
+  {
+    "id": "pmd-p03-02",
+    "source_passage": "passage-03-camote-ipn",
+    "source_passage_label": "P3 Harina de camote",
+    "spanish_text": "Estudiantes de la licenciatura en Nutrición del Instituto Politécnico Nacional (IPN) crearon una harina de camote, chía y arándanos, la cual posee alto contenido de vitaminas, minerales, fibra, Omega 3 y antioxidantes.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "regional-lexicon",
+      "technical-precision"
+    ],
+    "errors_to_catch": [
+      "IPN: expand on first use as in source (National Polytechnic Institute)",
+      "arándanos → blueberries in Mex. food-science sense (not automatic cranberries)",
+      "camote → sweet potato; Omega-3 keep"
+    ],
+    "why_this_chunk": "Acronym expand-once + arándanos sense choice.",
+    "suggested_ok_english_hint": "…National Polytechnic Institute (IPN) created a flour of sweet potato, chia, and blueberries…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 32
+  },
+  {
+    "id": "pmd-p03-03",
+    "source_passage": "passage-03-camote-ipn",
+    "source_passage_label": "P3 Harina de camote",
+    "spanish_text": "Dicha harina podrá usarse en la elaboración de productos de panificación que incidan en la salud de personas intolerantes al gluten (celiacas) y diabéticas, quienes tienen muchas restricciones en su dieta.",
+    "focus_traps": [
+      "technical-precision",
+      "pos-syntax"
+    ],
+    "errors_to_catch": [
+      "celiacas y diabéticas → people with celiac disease and diabetes (inclusive EN unless clearly women-only)",
+      "Don't drop gluten-intolerant gloss",
+      "Technical diet register"
+    ],
+    "why_this_chunk": "Gendered collectives → inclusive EN + medical terms.",
+    "suggested_ok_english_hint": "…bakery products that benefit people with celiac disease and diabetes, who face many dietary restrictions.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 31
+  },
+  {
+    "id": "pmd-p03-04",
+    "source_passage": "passage-03-camote-ipn",
+    "source_passage_label": "P3 Harina de camote",
+    "spanish_text": "Los creadores de la harina, Tania Yatziry Morales Flores y Adrián Olvera Campos, destacaron que es benéfica para personas con obesidad y sobrepeso y dislipidemias (con alto nivel de colesterol en la sangre) e, incluso, para embarazadas.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "technical-precision"
+    ],
+    "errors_to_catch": [
+      "Keep both full names; don't reorder/mangle",
+      "dislipidemias → dyslipidemias (+ parenthetical gloss ok)",
+      "Don't omit 'incluso… embarazadas'"
+    ],
+    "why_this_chunk": "Two personal names + medical term with gloss.",
+    "suggested_ok_english_hint": "Creators Tania Yatziry Morales Flores and Adrián Olvera Campos… beneficial for… dyslipidemias (high blood cholesterol) and even for pregnant women.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 37
+  },
+  {
+    "id": "pmd-p03-05",
+    "source_passage": "passage-03-camote-ipn",
+    "source_passage_label": "P3 Harina de camote",
+    "spanish_text": "Los estudiantes del Centro Interdisciplinario de la Salud (CICS) Unidad Milpa Alta, detallaron que una característica importante del camote es que contiene grandes cantidades de fibra, carbohidratos y almidón, además de que posee bajo índice glucémico, es decir, que libera lentamente el azúcar glucosa en el torrente sanguíneo y ayuda a estabilizar los niveles de glucosa en las personas que viven con diabetes, además de ser rico en vitamina B6.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "technical-precision",
+      "us-spelling"
+    ],
+    "errors_to_catch": [
+      "CICS: expand + keep acronym; Milpa Alta unit/campus",
+      "vitamina B6 → vitamin B6; glycemic (US)",
+      "Don't 'improve' by deleting the repeated GI explanation (O)"
+    ],
+    "why_this_chunk": "Acronym + vitamin B6 + resist omission of repeated science content.",
+    "suggested_ok_english_hint": "Students at the Interdisciplinary Health Center (CICS), Milpa Alta unit… low glycemic index… rich in vitamin B6.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 70
+  },
+  {
+    "id": "pmd-p03-06",
+    "source_passage": "passage-03-camote-ipn",
+    "source_passage_label": "P3 Harina de camote",
+    "spanish_text": "La chía es una importante fuente de Omega 3, fibra, aminoácidos como ácido glutámico, arginina, leucina, valina y serina (componentes esenciales de las proteínas), así como flavonoides (antioxidantes). Los arándanos aportan fibra al producto, antioxidantes e inhiben la formación de colesterol malo o LDL.",
+    "focus_traps": [
+      "regional-lexicon",
+      "technical-precision"
+    ],
+    "errors_to_catch": [
+      "arándanos → blueberries (Mex. food science)",
+      "colesterol malo o LDL → LDL ('bad') cholesterol",
+      "Keep amino acid list / flavonoid gloss — O risk"
+    ],
+    "why_this_chunk": "arándanos sense + LDL technical label in compact science copy.",
+    "suggested_ok_english_hint": "…Blueberries add fiber… and inhibit formation of LDL ('bad') cholesterol.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 44
+  },
+  {
+    "id": "pmd-p03-07",
+    "source_passage": "passage-03-camote-ipn",
+    "source_passage_label": "P3 Harina de camote",
+    "spanish_text": "La harina, que también posee una importante cantidad de calcio, fósforo, magnesio y potasio, por ahora fue empleada para elaborar hot cakes en las plantas piloto del CICS Milpa Alta, pero los jóvenes politécnicos mencionaron que uno de sus propósitos es introducir la harina en el mercado, y diversificar su uso en la producción de galletas, panqués y pasteles.",
+    "focus_traps": [
+      "regional-lexicon",
+      "names-titles-acronyms"
+    ],
+    "errors_to_catch": [
+      "hot cakes → pancakes/hotcakes (decide one)",
+      "panqués → cupcakes or pound cake (Mex.); not invented 'panques'",
+      "CICS Milpa Alta kept"
+    ],
+    "why_this_chunk": "Loanword hot cakes + panqués regional bakery + acronym site.",
+    "suggested_ok_english_hint": "…used so far to make pancakes at CICS Milpa Alta pilot plants… cookies, cupcakes/pound cakes, and cakes.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 59
+  },
+  {
+    "id": "pmd-p04-01",
+    "source_passage": "passage-04-prestamos-mexico",
+    "source_passage_label": "P4 Préstamos: lo bueno y lo malo",
+    "spanish_text": "¿Estás pensando en comprar una casa o departamento, financiar tus estudios o quizá dar el enganche para un auto? Llevar a cabo cada una de estas acciones representa mucha responsabilidad, pues es asumir un compromiso con alguna institución financiera, bajo un contrato que estipula el pago de un monto específico a ciertos plazos y con un porcentaje de interés, en donde si se llega a incumplir con algún punto, las finanzas personales corren peligro.",
+    "focus_traps": [
+      "false-friends",
+      "register",
+      "us-spelling"
+    ],
+    "errors_to_catch": [
+      "departamento → apartment (Mex.), not government department",
+      "enganche → down payment, not 'hook'",
+      "Keep tú/'you' consumer register",
+      "US: apartment (not flat)"
+    ],
+    "why_this_chunk": "Highest-yield Mex. finance false friends + tú register in the opener.",
+    "suggested_ok_english_hint": "Thinking of buying a house or apartment… or putting a down payment on a car? …commitment with a financial institution…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 74
+  },
+  {
+    "id": "pmd-p04-02",
+    "source_passage": "passage-04-prestamos-mexico",
+    "source_passage_label": "P4 Préstamos: lo bueno y lo malo",
+    "spanish_text": "De acuerdo con la Encuesta Nacional de Inclusión Financiera (ENIF), ‘Principales hallazgos nacionales y regionales 2018’, el 22% de la población encuestada solicitó un crédito para adquirir una vivienda, el 9% optó por un préstamo personal y únicamente el 4% lo hizo para obtener un automóvil.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "numbers-separators"
+    ],
+    "errors_to_catch": [
+      "ENIF: expand once as source; don't invent fake English acronym letters",
+      "Survey title strategy consistent (translate or keep+gloss)",
+      "22% / 9% / 4% / 2018 — keep numerals; consistent %"
+    ],
+    "why_this_chunk": "Survey title + acronym + three percentages.",
+    "suggested_ok_english_hint": "According to the National Survey of Financial Inclusion (ENIF), 'Main National and Regional Findings 2018,' 22%… 9%… only 4%…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 46
+  },
+  {
+    "id": "pmd-p04-03",
+    "source_passage": "passage-04-prestamos-mexico",
+    "source_passage_label": "P4 Préstamos: lo bueno y lo malo",
+    "spanish_text": "Aunque el mismo estudio afirma que las cifras para solicitar un préstamo han incrementado en los últimos tres años, no es algo que deba tomarse a la ligera, pues el manejo inadecuado del capital puede convertirse en un endeudamiento innecesario. Para evitar esto, Alejandro Saracho, experto en finanzas personales y autor del best seller ‘Reconfiguración Financiera’, aborda puntos específicos de lo bueno y lo malo para quienes están a punto de adquirir un compromiso financiero.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "false-friends",
+      "register"
+    ],
+    "errors_to_catch": [
+      "Alejandro Saracho — keep name",
+      "Book title strategy consistent; bestseller/best-seller one form",
+      "capital → funds/capital (not capital city)",
+      "Consumer-advice register"
+    ],
+    "why_this_chunk": "Author name + book title + capital sense.",
+    "suggested_ok_english_hint": "…Alejandro Saracho… author of the bestseller 'Financial Reconfiguration' (or keep ES title + gloss)…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 75
+  },
+  {
+    "id": "pmd-p04-04",
+    "source_passage": "passage-04-prestamos-mexico",
+    "source_passage_label": "P4 Préstamos: lo bueno y lo malo",
+    "spanish_text": "Ya sea un crédito hipotecario, empresarial, automotriz, entre otros, lo principal es tener un presupuesto para saber cuánto podrás pagar al mes y con qué frecuencia realizarías los pagos para no generar intereses, la aplicación gratuita presupuesto mensual para Android e iOS, te ayudará a organizar mejor tus finanzas personales para que al momento de adquirir un producto o servicio financiero puedas cumplir tus metas sin poner en riesgo tu capital.",
+    "focus_traps": [
+      "false-friends",
+      "register",
+      "pos-syntax"
+    ],
+    "errors_to_catch": [
+      "crédito hipotecario → mortgage (loan)",
+      "aplicación → app (mobile), not bare 'application'",
+      "Keep second-person 'you'; tidy EN run-on without omitting content",
+      "Android / iOS unchanged"
+    ],
+    "why_this_chunk": "Mortgage collocation + app false friend + tú run-on tidy-without-O.",
+    "suggested_ok_english_hint": "Whether a mortgage, business, or auto loan… the free Monthly Budget app for Android and iOS will help you…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 71
+  },
+  {
+    "id": "pmd-p04-05",
+    "source_passage": "passage-04-prestamos-mexico",
+    "source_passage_label": "P4 Préstamos: lo bueno y lo malo",
+    "spanish_text": "Finalmente, Alejandro Saracho recomienda que al solicitar un préstamo, pienses en la vida útil de lo que vas a adquirir, es decir, que esta sea mayor a la cantidad de tiempo que vas a estar pagando por él, ya que nadie quiere pagar algo que ya no está usando.",
+    "focus_traps": [
+      "register",
+      "names-titles-acronyms"
+    ],
+    "errors_to_catch": [
+      "Keep tú/'you' advice voice",
+      "Name Alejandro Saracho again",
+      "vida útil → useful life / service life"
+    ],
+    "why_this_chunk": "Short closing register check in consumer copy.",
+    "suggested_ok_english_hint": "…think about the useful life of what you're buying — it should exceed how long you'll be paying for it…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 49
+  },
+  {
+    "id": "pmd-p05-01",
+    "source_passage": "passage-05-humor-tv-cuba",
+    "source_passage_label": "P5 Humor en TV: ¿despegue definitivo?",
+    "spanish_text": "Humor en TV: ¿despegue definitivo?\npor Wilfredo Cancio Isla\n\nVuelvo sobre la seria problemática del humor en la televisión cubana. Y es para discrepar de algunas opiniones conformistas que ya creen totalmente resueltos los tropiezos sucesivos de nuestra programación humorística y habían incluso de una notable mejoría experimentada en los últimos meses. No niego que ciertos destellos esperanzado4res ha habido desde aquella fraternal polémica que condujo a un debate masivo acerca del tema en la Tertulia de la UNEAC, pero todo no resulta digno de la complacencia.",
+    "focus_traps": [
+      "source-defects",
+      "false-friends",
+      "names-titles-acronyms"
+    ],
+    "errors_to_catch": [
+      "habían incluso → hablan incluso (restore sense; don't translate typo)",
+      "esperanzado4res → esperanzadores",
+      "programación → TV programming/schedule (not coding)",
+      "UNEAC keep (+ expand if needed); byline Wilfredo Cancio Isla",
+      "humor US spelling; existential ha habido → there have been"
+    ],
+    "why_this_chunk": "OCR/typo restoration + TV programación + UNEAC + US humor in one opener.",
+    "suggested_ok_english_hint": "…they even speak of a marked improvement… I do not deny that there have been some encouraging flashes… UNEAC Tertulia/salon…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 87
+  },
+  {
+    "id": "pmd-p05-02",
+    "source_passage": "passage-05-humor-tv-cuba",
+    "source_passage_label": "P5 Humor en TV: ¿despegue definitivo?",
+    "spanish_text": "Nuevos programas han aparacido con intentos renovadores y, aunque las recientes comedias no representan todavía el nivel exquisito—necesario—a que aspiramos, no es menos cierto que encierran el mérito de romper con la rigidez de viejas fórmulas y el encasillamiento espacial (¡al fin el humor a la calle!) que gobernaba la realización humorística televisiva.",
+    "focus_traps": [
+      "source-defects",
+      "quotes-asides",
+      "false-friends"
+    ],
+    "errors_to_catch": [
+      "aparacido → aparecido (restore)",
+      "Keep em-dash parenthetical exquisito—necesario—",
+      "Keep aside (¡al fin el humor a la calle!) — O magnet",
+      "realización → production/making of TV humor (not 'realization')"
+    ],
+    "why_this_chunk": "Typo + dash aside + realización false friend — classic O cluster.",
+    "suggested_ok_english_hint": "New programs have appeared… the exquisite—necessary—level… (humor out on the street at last!) that governed TV humor production.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 53
+  },
+  {
+    "id": "pmd-p05-03",
+    "source_passage": "passage-05-humor-tv-cuba",
+    "source_passage_label": "P5 Humor en TV: ¿despegue definitivo?",
+    "spanish_text": "Humor, sátira e ironía—formas de lo cómico—tienen que estar destinados en nuestra sociedad socialista a precisar criterios y relegar conductas y hábitos inadecuados. Marx hablaba de despedirse alegremente del pasado y transformar el presente. Pero no se trate de crear tipos risibiles de tempestuosos modales e insólito comportamiento.",
+    "focus_traps": [
+      "register",
+      "source-defects",
+      "quotes-asides"
+    ],
+    "errors_to_catch": [
+      "Neutral transfer of sociedad socialista / Marx — don't editorialize",
+      "risibiles → risibles (restore typo)",
+      "Keep dash appositive formas de lo cómico",
+      "US humor spelling"
+    ],
+    "why_this_chunk": "Ideological register neutrality + typo + dash structure.",
+    "suggested_ok_english_hint": "…in our socialist society… Marx spoke of bidding farewell cheerfully to the past… Not a matter of creating laughable types…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 48
+  },
+  {
+    "id": "pmd-p05-04",
+    "source_passage": "passage-05-humor-tv-cuba",
+    "source_passage_label": "P5 Humor en TV: ¿despegue definitivo?",
+    "spanish_text": "Para solucionar estas dificultades la Televisión Cubana requiere del concurso y la colaboración de todos los factores posibles. Hay que encontrar los talentos capaces de reflejar la proverbial riqueza humorística y la carga satírica de nuestro pueblo.",
+    "focus_traps": [
+      "false-friends",
+      "register",
+      "us-spelling"
+    ],
+    "errors_to_catch": [
+      "concurso here = help/participation/input — NOT 'contest'",
+      "factores → parties/stakeholders/factors (institutional)",
+      "US humor; opinion register"
+    ],
+    "why_this_chunk": "Single high-yield concurso sense trap in closing call-to-action.",
+    "suggested_ok_english_hint": "…requires the participation/input and collaboration of every possible stakeholder…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 37
+  },
+  {
+    "id": "pmd-p06-01",
+    "source_passage": "passage-06-moneda-plata",
+    "source_passage_label": "P6 Moneda de Plata",
+    "spanish_text": "Desde hace varios años existe en el Congreso mexicano la inquietud por reintroducir la moneda de plata a la circulación monetaria. El proceso legislativo pasará a la historia como uno de los más inusitados y digno de estudio, pues México es el único país del mundo en donde el Congreso se atreve a cuestionar al Banco Central con relación al papel moneda, dinero político que no tiene ningún valor intrínseco y que es creado por decreto.",
+    "focus_traps": [
+      "institutions-headlines",
+      "technical-precision",
+      "pos-syntax"
+    ],
+    "errors_to_catch": [
+      "Congreso mexicano → Mexican Congress; Banco Central → central bank",
+      "papel moneda → paper money; valor intrínseco → intrinsic value",
+      "Source agreement glitch (inusitados y digno) → natural EN, no added claims",
+      "Formal opinion register"
+    ],
+    "why_this_chunk": "Institutions + money technicals + source agreement glitch.",
+    "suggested_ok_english_hint": "…Mexican Congress… question the central bank regarding paper money — political money with no intrinsic value, created by decree.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "short-paragraph",
+    "approx_word_count": 76
+  },
+  {
+    "id": "pmd-p06-02",
+    "source_passage": "passage-06-moneda-plata",
+    "source_passage_label": "P6 Moneda de Plata",
+    "spanish_text": "Desde 1971, cuando los Estados Unidos rompieron el compromiso de respaldar su dólar con oro a razón de una onza por cada 35 dólares, el mundo entero se ahoga cada vez más en un mar de papeles que no valen nada.",
+    "focus_traps": [
+      "numbers-separators",
+      "technical-precision",
+      "names-titles-acronyms"
+    ],
+    "errors_to_catch": [
+      "una onza por cada 35 dólares → $35 per ounce / one ounce per $35 — DO NOT swap ratio",
+      "1971; Estados Unidos → United States",
+      "Nixon-shock gold-window sense intact"
+    ],
+    "why_this_chunk": "Catastrophic Meaning trap if ounce/$ ratio is inverted.",
+    "suggested_ok_english_hint": "…at a rate of one ounce per 35 dollars ($35/oz)…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 41
+  },
+  {
+    "id": "pmd-p06-03",
+    "source_passage": "passage-06-moneda-plata",
+    "source_passage_label": "P6 Moneda de Plata",
+    "spanish_text": "El dinero fiat impera como única alternativa de intercambio y como la imposición ideológica de un dogmatismo que nadie osa cuestionar.",
+    "focus_traps": [
+      "technical-precision",
+      "register"
+    ],
+    "errors_to_catch": [
+      "dinero fiat → fiat money",
+      "Keep elevated opinion tone; don't soft-pedal 'dogmatismo'"
+    ],
+    "why_this_chunk": "One-sentence fiat technical + register.",
+    "suggested_ok_english_hint": "Fiat money reigns as the sole medium of exchange and as the ideological imposition of a dogmatism no one dares question.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 21
+  },
+  {
+    "id": "pmd-p06-04",
+    "source_passage": "passage-06-moneda-plata",
+    "source_passage_label": "P6 Moneda de Plata",
+    "spanish_text": "Pero únicamente en el Congreso mexicano se estudia la conveniencia de introducir una moneda con valor intrínseco, una moneda honesta que no depende de las reservas de dólar ni de la discrecionalidad de las autoridades, una moneda que sí es propiedad privada, no meros recibos de deuda.",
+    "focus_traps": [
+      "false-friends",
+      "technical-precision",
+      "institutions-headlines"
+    ],
+    "errors_to_catch": [
+      "discrecionalidad → discretion / discretionary power (not 'discretionarity')",
+      "recibos de deuda → debt receipts / IOUs / debt certificates",
+      "valor intrínseco again; parallel 'una moneda…' structure"
+    ],
+    "why_this_chunk": "discrecionalidad false friend + debt-receipt technical sense.",
+    "suggested_ok_english_hint": "…does not depend on dollar reserves or the authorities' discretionary power… private property, not mere debt receipts.",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 47
+  },
+  {
+    "id": "pmd-p06-05",
+    "source_passage": "passage-06-moneda-plata",
+    "source_passage_label": "P6 Moneda de Plata",
+    "spanish_text": "Precisó que no se pretende sustituir el circulante fiduciario, pues la moneda de plata entrará en paralelo y de forma complementaria al mismo, y añadió que el proyecto es factible no sólo para los países productores de plata, pues los que no lo son la pueden adquirir en el mercado.",
+    "focus_traps": [
+      "technical-precision",
+      "pos-syntax"
+    ],
+    "errors_to_catch": [
+      "circulante fiduciario → fiduciary/fiat currency in circulation (not 'fiduciary circulating')",
+      "Keep both en paralelo AND de forma complementaria — don't collapse",
+      "diputado context already set — parallel/complementary entry"
+    ],
+    "why_this_chunk": "Technical money term + dual parallel/complementary ideas.",
+    "suggested_ok_english_hint": "…not meant to replace fiduciary/fiat currency in circulation; silver coin will enter in parallel and complementary fashion…",
+    "private": true,
+    "visibility": "user-only",
+    "publishable": false,
+    "mode": "sentence",
+    "approx_word_count": 50
+  }
+]

@@ -2915,6 +2915,8 @@ export function selectMicros(opts: {
   }
   let pool = MICROS.slice();
   const bank = opts.bank;
+  // Friend-extract micros are not in MICROS. /practice loads them from the gated API.
+  if (bank === "private") return [];
   if (bank === "O" || bank === "P" || bank === "POS" || bank === "titles" || bank === "U") {
     pool = pool.filter((m) => m.bank === bank);
   } else if (bank === "weak") {

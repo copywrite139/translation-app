@@ -53,6 +53,14 @@ export type DrillItem = {
   errors_to_catch: string[];
   traps: Trap[];
   translationInstructions?: TranslationInstructions;
+  /** Soft coach line shown after submit. Not an exact-match key. */
+  coachHint?: string;
+  /** Sentence vs short paragraph while mode stays "micro". */
+  microShape?: "sentence" | "short-paragraph";
+  sourceLabel?: string;
+  why?: string;
+  /** Gated private bank. Never part of the public drill index. */
+  gated?: boolean;
 };
 
 export type SentenceItem = {
