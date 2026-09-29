@@ -38,6 +38,103 @@ const curly = gradeItem(
 );
 if (curly.points !== 0) throw new Error(`curly quotes scored ${curly.points}: ${curly.fired.map((f) => f.trapId).join(",")}`);
 
+const senator = getMicro("3");
+if (!senator) throw new Error("missing item 3");
+const senatorKey = gradeItem(senator, senator.english);
+if (!senatorKey.perfect || senatorKey.points !== 0) throw new Error("senator reference should be perfect");
+const senatorAlt = senator.acceptables?.[0];
+if (!senatorAlt) throw new Error("missing senator acceptable");
+const senatorAcceptable = gradeItem(senator, senatorAlt);
+if (!senatorAcceptable.perfect || senatorAcceptable.points !== 0) {
+  throw new Error("senator acceptable should be perfect");
+}
+
+function assertSpellingNearMiss(label: string, grade: ReturnType<typeof gradeItem>, expected: string) {
+  const marks = grade.fired.filter((mark) => mark.builtin && mark.category === "SP");
+  if (grade.clean || grade.perfect || grade.points === 0) {
+    throw new Error(`${label} scored ${grade.verdict} perfect=${grade.perfect} points=${grade.points}`);
+  }
+  if (marks.length !== 1) {
+    throw new Error(`${label} expected one SP builtin, got ${grade.fired.map((mark) => mark.trapId + ":" + mark.code).join(",") || "none"}`);
+  }
+  const mark = marks[0];
+  if (mark.weight !== chargeWeight("SP", 1) || mark.weight > 4) {
+    throw new Error(`${label} weight ${mark.weight}`);
+  }
+  if (mark.code !== `SP${mark.weight}`) throw new Error(`${label} code ${mark.code}`);
+  if ((mark.okExample || "").toLowerCase() !== expected) {
+    throw new Error(`${label} okExample ${mark.okExample}`);
+  }
+  if (grade.blocksAdvance) throw new Error(`${label} must not lock the next sentence`);
+}
+
+assertSpellingNearMiss(
+  "critized",
+  gradeItem(senator, "The Democratic senator from the state of California critized the Republican proposal."),
+  "criticized"
+);
+assertSpellingNearMiss(
+  "critized in acceptable wording",
+  gradeItem(senator, "The Democratic senator from California critized the Republican proposal."),
+  "criticized"
+);
+assertSpellingNearMiss(
+  "propasal",
+  gradeItem(senator, "The Democratic senator from the state of California criticized the Republican propasal."),
+  "proposal"
+);
+
+const spellingFixture = {
+  english: "The government published the report.",
+  traps: [],
+};
+if (gradeItem(spellingFixture, spellingFixture.english).points !== 0) {
+  throw new Error("government reference should be clean");
+}
+assertSpellingNearMiss(
+  "goverment",
+  gradeItem(spellingFixture, "The goverment published the report."),
+  "government"
+);
+const spelledAcceptable = {
+  english: "The government published the report.",
+  acceptables: ["The goverment published the report."],
+  traps: [],
+};
+const allowedTypo = gradeItem(spelledAcceptable, "The goverment published the report.");
+if (!allowedTypo.perfect || allowedTypo.points !== 0) {
+  throw new Error("listed acceptable spelling must stay perfect");
+}
+
+const paraphrase = gradeItem(senator, "The Democratic senator from California attacked the Republican bill.");
+if (paraphrase.points !== 0 || paraphrase.fired.some((mark) => mark.trapId.startsWith("builtin-spelling"))) {
+  throw new Error(`paraphrase scored ${paraphrase.verdict}`);
+}
+const inflected = gradeItem(
+  senator,
+  "The Democratic senator from the state of California criticize the Republican proposal."
+);
+if (inflected.fired.some((mark) => mark.category === "SP")) {
+  throw new Error(`inflection scored ${inflected.verdict}`);
+}
+const partyNoun = gradeItem(
+  senator,
+  "The Democrat senator from the state of California criticized the Republican proposal."
+);
+if (partyNoun.fired.some((mark) => mark.trapId.startsWith("builtin-spelling"))) {
+  throw new Error(`Democrat scored ${partyNoun.verdict}`);
+}
+const lowerParty = gradeItem(
+  senator,
+  "The democratic senator from the state of California criticized the Republican proposal."
+);
+if (!lowerParty.fired.some((mark) => mark.trapId === "3-democratic")) {
+  throw new Error("party-name cap trap did not fire");
+}
+if (lowerParty.fired.some((mark) => mark.trapId.startsWith("builtin-spelling"))) {
+  throw new Error("capitalization was also marked as a typo");
+}
+
 if (chargeWeight("P", 8) !== 4) throw new Error("P cap failed");
 if (chargeWeight("SP", 16) !== 4) throw new Error("SP cap failed");
 if (chargeWeight("T", 8) !== 8) throw new Error("T should keep 8");

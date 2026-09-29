@@ -322,6 +322,119 @@ function terminalPunctMark(reference: string, text: string): FiredMark | null {
   };
 }
 
+/** Grammatical endings, so criticize/criticized is not treated as a typo. */
+const SPELLING_AFFIX = /^(?:s|es|ed|d|ing|ly|er|est|ic|al|ion|tion|sion|ness|ment|able|ible|ies|ied)$/;
+
+function spellingTokens(raw: string): { fold: string; surface: string }[] {
+  const text = normalizeKeepCase(raw);
+  const out: { fold: string; surface: string }[] = [];
+  const re = /\p{L}+/gu;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(text))) {
+    const surface = match[0];
+    const fold = stripAccents(surface).toLowerCase();
+    if (fold) out.push({ fold, surface });
+  }
+  return out;
+}
+
+function boundedEditDistance(a: string, b: string, max: number): number {
+  const la = a.length;
+  const lb = b.length;
+  if (Math.abs(la - lb) > max) return max + 1;
+  const dp: number[][] = Array.from({ length: la + 1 }, () => new Array(lb + 1).fill(0));
+  for (let i = 0; i <= la; i++) dp[i][0] = i;
+  for (let j = 0; j <= lb; j++) dp[0][j] = j;
+  for (let i = 1; i <= la; i++) {
+    let rowMin = max + 1;
+    for (let j = 1; j <= lb; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      let value = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        value = Math.min(value, dp[i - 2][j - 2] + 1);
+      }
+      dp[i][j] = value;
+      if (value < rowMin) rowMin = value;
+    }
+    if (rowMin > max) return max + 1;
+  }
+  return dp[la][lb];
+}
+
+function isAffixVariant(a: string, b: string): boolean {
+  const [shorter, longer] = a.length <= b.length ? [a, b] : [b, a];
+  if (longer.startsWith(shorter) && SPELLING_AFFIX.test(longer.slice(shorter.length))) return true;
+  if (shorter.length >= 4 && shorter.endsWith("y")) {
+    const stem = shorter.slice(0, -1);
+    if (longer.startsWith(stem) && SPELLING_AFFIX.test(longer.slice(stem.length))) return true;
+  }
+  return false;
+}
+
+/** Distance when `typed` is an orthographic near-miss of `expected`; otherwise null. */
+function nearMissDistance(typed: string, expected: string): number | null {
+  if (!typed || !expected || typed === expected) return null;
+  if (STOP_WORDS.has(typed) || STOP_WORDS.has(expected)) return null;
+  const longerLen = Math.max(typed.length, expected.length);
+  const shorterLen = Math.min(typed.length, expected.length);
+  if (longerLen < 5 || shorterLen < 4) return null;
+  if (typed[0] !== expected[0] || typed[typed.length - 1] !== expected[expected.length - 1]) return null;
+  if (isAffixVariant(typed, expected)) return null;
+  const max = longerLen >= 8 ? 2 : 1;
+  if (Math.abs(typed.length - expected.length) > max) return null;
+  const dist = boundedEditDistance(typed, expected, max);
+  if (dist < 1 || dist > max) return null;
+  return dist;
+}
+
+/**
+ * Single-token spelling near-misses against the reference and acceptables.
+ * One recoverable typo is SP1. chargeWeight caps SP at 4.
+ */
+function spellingNearMissMarks(reference: string, acceptables: string[] | undefined, text: string): FiredMark[] {
+  const sources = [reference, ...(acceptables ?? [])].filter((source) => source && source.trim());
+  if (!sources.length || !text.trim()) return [];
+
+  const allowed = new Set<string>();
+  const targets: { fold: string; surface: string }[] = [];
+  const seenTarget = new Set<string>();
+  for (const source of sources) {
+    for (const token of spellingTokens(source)) {
+      allowed.add(token.fold);
+      if (seenTarget.has(token.fold)) continue;
+      seenTarget.add(token.fold);
+      targets.push(token);
+    }
+  }
+
+  const marks: FiredMark[] = [];
+  for (const token of spellingTokens(text)) {
+    if (allowed.has(token.fold) || STOP_WORDS.has(token.fold) || token.fold.length < 4) continue;
+    let best: { surface: string; dist: number } | null = null;
+    for (const target of targets) {
+      const dist = nearMissDistance(token.fold, target.fold);
+      if (dist === null) continue;
+      if (!best || dist < best.dist) best = { surface: target.surface, dist };
+    }
+    if (!best) continue;
+    const weight = chargeWeight("SP", 1);
+    marks.push({
+      trapId: `builtin-spelling-${marks.length}`,
+      category: "SP",
+      weight,
+      code: `SP${weight}`,
+      comment: `"${token.surface}" is a misspelling of "${best.surface}". A one-word near miss on the English target is a spelling error.`,
+      okExample: best.surface,
+      noExample: token.surface,
+      pitfall: "Misspelling",
+      label: `${token.surface} for ${best.surface}`,
+      pass: "A",
+      builtin: true,
+    });
+  }
+  return marks;
+}
+
 function lengthWarning(target: string, reference: string): string[] {
   const a = wordCount(target);
   const b = wordCount(reference);
@@ -399,6 +512,7 @@ export function gradeItem(
       fired.push(markFrom(trap, trap.category, weight));
     }
     if (micro) {
+      fired.push(...spellingNearMissMarks(item.english, item.acceptables, text));
       const terminal = terminalPunctMark(item.english, text);
       if (terminal) fired.push(terminal);
     }
