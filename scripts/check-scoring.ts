@@ -1,5 +1,5 @@
 import { getMicro, PASSAGE } from "../lib/drills";
-import { gradeItem, gradePassage, chargeWeight, describeMark } from "../lib/scoring";
+import { gradeItem, gradePassage, chargeWeight, describeMark, assertReferenceClean } from "../lib/scoring";
 
 const item = getMicro("pos-compromiso");
 if (!item) throw new Error("missing compromiso item");
@@ -29,6 +29,69 @@ if (!noPeriod.fired.some((f) => f.trapId === "builtin-terminal")) {
   throw new Error(`missing period not flagged: ${noPeriod.verdict}`);
 }
 if (noPeriod.blocksAdvance) throw new Error("missing period must not lock the next sentence");
+
+const congressKey = assertReferenceClean(congress);
+if (congressKey) throw new Error(congressKey);
+if (gradeItem(congress, congress.english).points !== 0) throw new Error("congress reference should score 0");
+
+const titleArticle = gradeItem(
+  congress,
+  "The Mexican Congressman José Ramírez met with the Secretary of State."
+);
+const titleArticleCodes = titleArticle.fired.map((f) => f.code);
+if (!titleArticle.fired.some((f) => f.trapId === "1-title-article" && f.code === "U1" && f.weight === 1)) {
+  throw new Error(`title-article should be U1, got ${titleArticleCodes.join("+") || "none"}`);
+}
+if (titleArticle.fired.some((f) => f.category === "A" || f.category === "O")) {
+  throw new Error(`title-article false A/O: ${titleArticleCodes.join("+")}`);
+}
+if (titleArticle.points !== 1) throw new Error(`title-article points ${titleArticle.points}`);
+
+const titleArticleBare = gradeItem(
+  congress,
+  "The Congressman José Ramírez met with the Secretary of State."
+);
+if (!titleArticleBare.fired.some((f) => f.trapId === "1-title-article" && f.code === "U1")) {
+  throw new Error(`The Congressman José should be U1: ${titleArticleBare.verdict}`);
+}
+if (!titleArticleBare.fired.some((f) => f.trapId === "1-mexicano" && f.category === "O")) {
+  throw new Error(`dropping mexicano should stay O: ${titleArticleBare.verdict}`);
+}
+if (titleArticleBare.fired.some((f) => f.category === "A")) {
+  throw new Error(`The Congressman José false addition: ${titleArticleBare.verdict}`);
+}
+
+const droppedNationality = gradeItem(
+  congress,
+  "Congressman José Ramírez met with the Secretary of State."
+);
+if (!droppedNationality.fired.some((f) => f.trapId === "1-mexicano" && f.category === "O")) {
+  throw new Error(`omitting Mexican should be O: ${droppedNationality.verdict}`);
+}
+if (droppedNationality.fired.some((f) => f.trapId === "1-title-article" || f.category === "A")) {
+  throw new Error(`omitting Mexican false U/A: ${droppedNationality.verdict}`);
+}
+
+if (lower.fired.some((f) => f.trapId === "1-title-article")) {
+  throw new Error("lowercase congressman must stay on the caps trap");
+}
+if (!lower.fired.some((f) => f.trapId === "1-congressman-caps")) {
+  throw new Error("lowercase congressman caps trap did not fire");
+}
+
+const lowerArticle = gradeItem(
+  congress,
+  "the Mexican congressman José Ramírez met with the Secretary of State."
+);
+if (lowerArticle.fired.some((f) => f.trapId === "1-title-article")) {
+  throw new Error("lowercase congressman with the must not be U1");
+}
+if (!lowerArticle.fired.some((f) => f.trapId === "1-congressman-caps" && f.category === "SP")) {
+  throw new Error(`lowercase congressman with the should stay SP: ${lowerArticle.verdict}`);
+}
+if (lowerArticle.fired.some((f) => f.category === "O" || f.category === "A")) {
+  throw new Error(`lowercase congressman false O/A: ${lowerArticle.verdict}`);
+}
 
 const quoteItem = getMicro("4");
 if (!quoteItem) throw new Error("missing item 4");

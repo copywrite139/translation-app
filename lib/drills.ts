@@ -125,6 +125,23 @@ export const MICROS: DrillItem[] = [
         label: "Nationality mexicano dropped",
         lemma: "mexicano",
       }),
+      trap({
+        id: "1-title-article",
+        category: "U",
+        weight: 1,
+        detector: {
+          kind: "forbidden_pattern",
+          // Title case immediately before the name. Lowercase "congressman" stays on 1-congressman-caps.
+          pattern:
+            "\\b[Tt]he\\s+(?:Mexican\\s+)?(?:Congressman|Congresswoman|Senator|Representative)\\s+[A-ZÁÉÍÓÚÜÑ]",
+        },
+        comment:
+          "A title in title case immediately before a personal name takes no article. The Mexican Congressman José and The Congressman José are usage, not an addition and not an omission of mexicano.",
+        ok: "Mexican Congressman José Ramírez",
+        no: "The Mexican Congressman José Ramírez",
+        pitfall: "Title-article usage",
+        label: "The Congressman José",
+      }),
     ],
   }),
   micro({
