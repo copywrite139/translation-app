@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { explainAskWhy, parseAskWhyRequest } from "../../lib/askWhy";
 
 /**
- * Text-only tutor note for a trap that already fired.
+ * Text-only tutor note for an armed trap, whether it fired or the candidate caught it.
  * The answer is composed from the armed packet. It does not rescore.
  */
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

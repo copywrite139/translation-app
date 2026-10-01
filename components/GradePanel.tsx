@@ -1,5 +1,5 @@
 import { AskWhy } from "./AskWhy";
-import { describeMark, microHeadline, PassageGrade, GradeResult, FiredMark } from "../lib/scoring";
+import { chargeWeight, describeMark, microHeadline, PassageGrade, GradeResult, FiredMark } from "../lib/scoring";
 import { CATEGORIES, CATEGORY_NAME, PASS_LINE, Trap } from "../lib/types";
 
 export type AskContext = {
@@ -163,11 +163,25 @@ function TrapLists(props: { grade: GradeResult; ask?: AskContext }) {
         <strong>Trap caught</strong>
         {caught.length === 0 ? <div>None armed, or all of them fired.</div> : null}
         <ul>
-          {caught.map((t) => (
-            <li key={t.trapId}>
-              {t.code} {t.label}
-            </li>
-          ))}
+          {caught.map((t) => {
+            const mark = props.ask ? markForAvoided(t, props.ask.traps) : null;
+            return (
+              <li key={t.trapId}>
+                {t.code} {t.label}
+                {props.ask && mark ? (
+                  <AskWhy
+                    mark={mark}
+                    spanish={props.ask.spanish}
+                    candidate={props.ask.candidate}
+                    reference={props.ask.reference}
+                    traps={props.ask.traps}
+                    fired={props.grade.fired}
+                    displayedPoints={props.grade.points}
+                  />
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
@@ -196,6 +210,25 @@ export function FiredTrap(props: { mark: FiredMark; grade: GradeResult; ask?: As
       ) : null}
     </div>
   );
+}
+
+function markForAvoided(row: GradeResult["avoided"][number], traps: Trap[]): FiredMark | null {
+  const trap = traps.find((item) => item.id === row.trapId);
+  if (!trap) return null;
+  const weight = chargeWeight(trap.category, trap.weightIfMissed);
+  return {
+    trapId: row.trapId,
+    category: trap.category,
+    weight,
+    code: `${trap.category}${weight}`,
+    comment: trap.comment,
+    okExample: trap.okExample,
+    noExample: trap.noExample,
+    pitfall: trap.pitfall,
+    label: trap.label,
+    lemma: trap.lemma,
+    pass: trap.pass,
+  };
 }
 
 function Histogram(props: { points: Record<string, number> }) {

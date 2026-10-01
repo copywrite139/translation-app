@@ -578,7 +578,20 @@ function compose(req: AskWhyRequest): string {
     if (quiet.length) return explainQuiet(quiet, req);
   }
 
+  if (!anchor.fired) return explainCaught(anchor, req);
   return explainFired(anchor, req, whyQuiet && anchor.fired);
+}
+
+/** "Why this code?" on a trap the candidate avoided: armed, quiet, score unchanged. */
+function explainCaught(trap: AskTrap, req: AskWhyRequest): string {
+  const reason = `${trap.code} (${trap.label}) was armed and did not fire because ${ruleOf(trap)}.`;
+  const body = explainFired(trap, req, false);
+  const full = `${reason}\n\n${body}`;
+  if (tutorSentences(full).length <= 8) return full;
+  const note = `${trap.code} (${trap.label}) was armed and did not fire.`;
+  const shorter = `${note}\n\n${body}`;
+  if (tutorSentences(shorter).length <= 8) return shorter;
+  return body;
 }
 
 function grounded(answer: string, req: AskWhyRequest): string {
@@ -590,7 +603,7 @@ function grounded(answer: string, req: AskWhyRequest): string {
   return answer;
 }
 
-/** Tutor note for one fired trap. Uses the armed packet only and does not rescore. */
+/** Tutor note for one armed trap, fired or caught. Uses the armed packet only and does not rescore. */
 export function explainAskWhy(req: AskWhyRequest): string {
   return grounded(compose(req), req);
 }
@@ -677,10 +690,13 @@ export function parseAskWhyRequest(body: unknown): { ok: true; value: AskWhyRequ
     armedTraps.push(trap);
   }
   const trap = readTrap(raw.trap, 0);
-  if (typeof trap === "string") return { ok: false, error: "trap must be the fired trap for this row" };
-  if (!trap.fired) return { ok: false, error: "Ask why opens from a fired trap" };
-  if (!armedTraps.some((row) => row.trapId === trap.trapId && row.fired)) {
-    return { ok: false, error: "That trap is not on the fired list for this grade" };
+  if (typeof trap === "string") return { ok: false, error: "trap must be the trap for this row" };
+  if (trap.fired) {
+    if (!armedTraps.some((row) => row.trapId === trap.trapId && row.fired)) {
+      return { ok: false, error: "That trap is not on the fired list for this grade" };
+    }
+  } else if (!armedTraps.some((row) => row.trapId === trap.trapId)) {
+    return { ok: false, error: "That trap is not on the armed list for this grade" };
   }
   if (typeof raw.source !== "string" || typeof raw.candidate !== "string") {
     return { ok: false, error: "source and candidate are required" };
