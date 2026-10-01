@@ -14,7 +14,7 @@ export function AskWhy(props: {
   fired: FiredMark[];
   displayedPoints: number;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [question, setQuestion] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
