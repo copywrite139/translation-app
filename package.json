@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "check:goldens": "tsx scripts/check-grader-goldens.ts"
   },
   "dependencies": {
     "next": "14.0.0",
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.0.0"
   }
 }

@@ -55,6 +55,7 @@ export type PassageGrade = {
 type Gradeable = {
   mode?: "micro" | "passage";
   english: string;
+  spanish?: string;
   acceptables?: string[];
   traps: Trap[];
 };
@@ -435,6 +436,80 @@ function spellingNearMissMarks(reference: string, acceptables: string[] | undefi
   return marks;
 }
 
+/** English exonyms that drop a source accent. Not a personal-name diacritic choice. */
+const GEO_EXONYM_FOLDS = new Set(["peru", "mexico"]);
+
+/** Capitalized Spanish function words, not personal names. */
+const NAME_STOP_FOLDS = new Set([
+  "el", "ella", "ellos", "ellas", "esta", "este", "esto", "estas", "estos",
+  "esa", "ese", "eso", "esas", "esos", "aquel", "aquella", "aquellos", "aquellas",
+  "aun", "mas", "si", "tu", "te", "mi", "un", "una",
+]);
+
+function hasDiacritic(value: string): boolean {
+  const nfc = value.normalize("NFC");
+  return stripAccents(nfc) !== nfc;
+}
+
+/** fold (no diacritics) → lowercase source form with diacritics. */
+function collectAccentedNames(sources: string[]): Map<string, string> {
+  const forms = new Map<string, string>();
+  const re = /\p{Lu}[\p{L}\p{M}'’-]+/gu;
+  for (const source of sources) {
+    const text = normalizeKeepCase(source || "");
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(text))) {
+      const surface = match[0].normalize("NFC");
+      if (!hasDiacritic(surface)) continue;
+      const accented = surface.toLowerCase().normalize("NFC");
+      const fold = stripAccents(accented);
+      if (fold.length < 3 || GEO_EXONYM_FOLDS.has(fold) || NAME_STOP_FOLDS.has(fold)) continue;
+      if (!forms.has(fold)) forms.set(fold, accented);
+    }
+  }
+  return forms;
+}
+
+/**
+ * IEGS Names, personal and geographic: diacritics on a personal name are all intact
+ * or all stripped. Fully stripped Jose Ramirez is not an error. José Ramirez is.
+ */
+function nameDiacriticMark(spanish: string | undefined, english: string, candidate: string): FiredMark | null {
+  const forms = collectAccentedNames([spanish || "", english || ""]);
+  if (!forms.size || !candidate.trim()) return null;
+  let intact = false;
+  let strippedSeen = false;
+  let partial = false;
+  const re = /\p{L}[\p{L}\p{M}'’-]+/gu;
+  const text = normalizeKeepCase(candidate);
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(text))) {
+    const lower = match[0].normalize("NFC").toLowerCase();
+    const fold = stripAccents(lower);
+    const canonical = forms.get(fold);
+    if (!canonical) continue;
+    if (lower === canonical) intact = true;
+    else if (lower === fold) strippedSeen = true;
+    else partial = true;
+  }
+  if (!partial && !(intact && strippedSeen)) return null;
+  const weight = chargeWeight("SP", 2);
+  return {
+    trapId: "builtin-name-diacritics",
+    category: "SP",
+    weight,
+    code: `SP${weight}`,
+    comment:
+      "Personal-name diacritics must be all intact or all stripped, consistently. IEGS Names, personal and geographic: “Diacritical marks in the source language must be rendered in English either with all diacritical marks intact or with no diacritical marks indicated, consistently throughout the entire passage.” José Ramírez and Jose Ramirez are both acceptable. José Ramirez mixes the two.",
+    okExample: "José Ramírez — or Jose Ramirez",
+    noExample: "José Ramirez",
+    pitfall: "Inconsistent name diacritics",
+    label: "Name diacritics mixed",
+    pass: "A",
+    builtin: true,
+  };
+}
+
 function lengthWarning(target: string, reference: string): string[] {
   const a = wordCount(target);
   const b = wordCount(reference);
@@ -478,22 +553,8 @@ export function gradeItem(
   const text = normalizeKeepCase(raw);
   const folded = text.toLowerCase();
   const useBuiltins = opts?.builtins !== false && mode !== "sentence";
-
-  if (text && mode !== "sentence" && isExactOrAcceptable(text, item, mode === "passage" ? "passage" : "micro")) {
-    const histogram = emptyHistogram();
-    return {
-      points: 0,
-      clean: true,
-      perfect: true,
-      blocksAdvance: false,
-      scaleLabel: scaleLabel(0),
-      verdict: "Perfect",
-      fired: [],
-      avoided: avoidedOf(item.traps, new Set()),
-      warnings: [],
-      histogram,
-    };
-  }
+  const exact =
+    !!text && mode !== "sentence" && isExactOrAcceptable(text, item, mode === "passage" ? "passage" : "micro");
 
   const fired: FiredMark[] = [];
   const micro = mode === "micro";
@@ -501,7 +562,10 @@ export function gradeItem(
 
   const blank = fired.some((f) => f.trapId === "builtin-blank");
   if (!blank) {
-    if (micro) {
+    // The omission heuristic flags unrecognized partials. An exact reference or
+    // acceptable is already a full rendering, so it must not become an O8.
+    // Armed traps still run: a listed acceptable cannot hide a real mark.
+    if (micro && !exact) {
       const major = majorOmissionMark(item.english, text, folded);
       if (major) fired.push(major);
     }
@@ -515,10 +579,28 @@ export function gradeItem(
       fired.push(...spellingNearMissMarks(item.english, item.acceptables, text));
       const terminal = terminalPunctMark(item.english, text);
       if (terminal) fired.push(terminal);
+      const names = nameDiacriticMark(item.spanish, item.english, text);
+      if (names) fired.push(names);
     }
   }
 
   const points = fired.reduce((sum, f) => sum + f.weight, 0);
+  const weighted = fired.some((mark) => mark.weight > 0);
+  // Exact reference/acceptable text is not a free pass. Score the traps first.
+  if (exact && !weighted && points === 0 && fired.length === 0) {
+    return {
+      points: 0,
+      clean: true,
+      perfect: true,
+      blocksAdvance: false,
+      scaleLabel: scaleLabel(0),
+      verdict: "Perfect",
+      fired: [],
+      avoided: avoidedOf(item.traps, new Set()),
+      warnings: [],
+      histogram: emptyHistogram(),
+    };
+  }
   const histogram = emptyHistogram();
   for (const f of fired) histogram[f.category] += f.weight;
   const clean = points === 0;
@@ -566,21 +648,40 @@ export function gradePassage(passage: PassageItem, raw: string): PassageGrade {
     };
   }
   if (isExactOrAcceptable(text, passage, "passage")) {
-    const histogram = emptyHistogram();
-    const sentences = passage.sentences.map((s) => ({
+    const userSentences = splitEnglishSentences(text);
+    const aligned = userSentences.length === passage.sentences.length;
+    const sentences = passage.sentences.map((s, i) => ({
       id: s.id,
       spanish: s.spanish,
       english: s.english,
-      grade: gradeItem(s, s.english, { mode: "sentence", builtins: false }),
+      grade: gradeItem(s, aligned ? userSentences[i] : text, { mode: "sentence", builtins: false }),
     }));
+    const fired = sentences.flatMap((s) => s.grade.fired);
+    const names = nameDiacriticMark(passage.spanish, passage.english, text);
+    if (names) fired.push(names);
+    const points = fired.reduce((sum, f) => sum + f.weight, 0);
+    const histogram = emptyHistogram();
+    for (const f of fired) histogram[f.category] += f.weight;
+    if (points === 0 && fired.length === 0) {
+      return {
+        points: 0,
+        scaleLabel: scaleLabel(0),
+        verdict: "Perfect",
+        sentences,
+        fired: [],
+        histogram,
+        warnings: [],
+        patternNote: null,
+      };
+    }
     return {
-      points: 0,
-      scaleLabel: scaleLabel(0),
-      verdict: "Perfect",
+      points,
+      scaleLabel: scaleLabel(points),
+      verdict: scaleLabel(points),
       sentences,
-      fired: [],
+      fired,
       histogram,
-      warnings: [],
+      warnings: lengthWarning(text, passage.english),
       patternNote: null,
     };
   }
@@ -615,6 +716,8 @@ export function gradePassage(passage: PassageItem, raw: string): PassageGrade {
         builtin: true,
       });
     }
+    const names = nameDiacriticMark(passage.spanish, passage.english, text);
+    if (names) fired.push(names);
   }
 
   const points = fired.reduce((sum, f) => sum + f.weight, 0);
@@ -624,7 +727,12 @@ export function gradePassage(passage: PassageItem, raw: string): PassageGrade {
   return {
     points,
     scaleLabel: scaleLabel(points),
-    verdict: text && isExactOrAcceptable(text, passage, "passage") ? "Perfect" : points === 0 ? "Clean" : scaleLabel(points),
+    verdict:
+      points === 0 && fired.length === 0 && text && isExactOrAcceptable(text, passage, "passage")
+        ? "Perfect"
+        : points === 0
+          ? "Clean"
+          : scaleLabel(points),
     sentences,
     fired,
     histogram,

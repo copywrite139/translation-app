@@ -142,6 +142,24 @@ export const MICROS: DrillItem[] = [
         pitfall: "Title-article usage",
         label: "The Congressman José",
       }),
+      trap({
+        id: "1-meet-with",
+        category: "U",
+        weight: 1,
+        detector: {
+          kind: "forbidden_pattern",
+          // reunirse con → met with. Bare "met the Secretary" / "met Secretary" misses the preposition.
+          pattern: "\\bmet\\s+(?!with\\b)(?:the\\s+)?secretary\\b",
+          flags: "i",
+        },
+        comment:
+          "se reunió con an officeholder is met with, not bare met. IEGS Phrasal verbs: errors virtually always involve the wrong adverb or preposition; when the phrase is still clear, few points are assessed.",
+        ok: "met with the Secretary of State",
+        no: "met the Secretary of State",
+        pitfall: "meet with collocation",
+        label: "met the Secretary (missing with)",
+        lemma: "reunirse",
+      }),
     ],
   }),
   micro({
@@ -1737,7 +1755,7 @@ export const MICROS: DrillItem[] = [
         id: "p-splice-hit",
         category: "P",
         weight: 2,
-        detector: { kind: "forbidden_pattern", pattern: "\\brained hard,\\s+they\\b", flags: "i" },
+        detector: { kind: "forbidden_pattern", pattern: "(?:^|[.!?]\\s+)It rained hard,\\s+they\\b", flags: "i" },
         comment: "Two independent clauses cannot share only a comma. Use so, a semicolon, or a period.",
         ok: "It rained hard, so they canceled the game.",
         no: "It rained hard, they canceled the game.",
