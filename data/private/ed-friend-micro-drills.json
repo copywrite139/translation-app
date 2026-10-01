@@ -55,7 +55,7 @@
       "false-friends"
     ],
     "errors_to_catch": [
-      "José Faustino Sánchez Carrión — keep accents/form; no 'Joseph…'",
+      "José Faustino Sánchez Carrión — all diacritics or none; no Joseph",
       "emancipación / coloniaje → independence / colonial rule (not 'colonization')",
       "régimen → form of government here, not 'diet'",
       "Perú → Peru (no accent in EN)"
@@ -148,7 +148,7 @@
       "register"
     ],
     "errors_to_catch": [
-      "Raúl Borrás — transfer name/accent consistently",
+      "Raúl Borrás — all diacritics or none; do not drop the surname",
       "News wire voice; no essay flourishes",
       "Don't invent English ministry nickname"
     ],

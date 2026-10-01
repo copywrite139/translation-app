@@ -179,7 +179,8 @@ const SPECS: Record<string, Spec[]> = {
       weight: 8,
       pitfall: "names-titles-acronyms",
       detector: all([`S[aá]nchez Carri[oó]n`], "\\bJoseph\\b"),
-      comment: "Keep José Faustino Sánchez Carrión. Joseph anglicizes the given name.",
+      comment:
+        "Keep José Faustino Sánchez Carrión, with every diacritic intact or every diacritic stripped. Joseph anglicizes the given name. IEGS Names, personal and geographic: diacritics are all intact or all absent, consistently.",
       ok: "José Faustino Sánchez Carrión",
       no: "Joseph Faustino Sanchez Carrion",
       lemma: "Sánchez Carrión",
@@ -357,7 +358,8 @@ const SPECS: Record<string, Spec[]> = {
       weight: 8,
       pitfall: "names-titles-acronyms",
       detector: all([`Borr[aá]s`]),
-      comment: "Transfer Raúl Borrás, with the accent or without, but do not drop the surname.",
+      comment:
+        "Transfer Raúl Borrás. IEGS Names, personal and geographic: diacritics on the name are all intact (Raúl Borrás) or all stripped (Raul Borras). Raúl Borras mixes them. Do not drop the surname.",
       ok: "Minister Raúl Borrás",
       no: "the minister",
       lemma: "Borrás",
