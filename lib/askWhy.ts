@@ -1,3 +1,11 @@
+import {
+  formatIegsLocator,
+  formatIegsQuote,
+  IegsHit,
+  matchIegsText,
+  matchTrapToIegs,
+  topicsForCategory,
+} from "./iegsIndex";
 import { chargeWeight, FiredMark } from "./scoring";
 import { CATEGORIES, CATEGORY_NAME, DetectorSpec, ErrorCat, Trap, Weight } from "./types";
 
@@ -28,7 +36,13 @@ export type AskWhyRequest = {
   displayedPoints: number;
 };
 
-export const ASK_PRESETS = ["Why this code?", "What was the Spanish job?", "What's a clean fix?"] as const;
+export const ASK_PRESETS = [
+  "Why this code?",
+  "What was the Spanish job?",
+  "What's a clean fix?",
+  "Where in IEGS?",
+  "What does IEGS say?",
+] as const;
 
 const WEIGHTS: Weight[] = [1, 2, 4, 8, 16];
 
@@ -251,13 +265,22 @@ function iegsLine(trap: AskTrap, didFire: boolean): string {
   return `IEGS/ATA: ${trap.code} ${verb} ${name}, weight ${trap.weight}, because ${angle(trap)} (${pass}).`;
 }
 
-/** Locator for the printed PDF. Category names come from the app. No page numbers are stored. */
+/** Category, pass, and label, plus an IEGS 2025 locator when the index has one. */
 function standardsPointer(trap: AskTrap): string {
   const name = CATEGORY_NAME[trap.category];
   const pass = trap.pass === "A" ? "Pass A (English only)" : "Pass B (source vs target)";
   const label = (trap.pitfall || "").replace(/[.!?]/g, "").trim();
   const labelBit = label ? `, label "${label}"` : "";
-  return `Standards pointer: printed ATA Into-English grading standards, error category ${name} (${trap.category}), ${pass}${labelBit} (no page number stored).`;
+  const base = `Standards pointer: printed ATA Into-English grading standards, error category ${name} (${trap.category}), ${pass}${labelBit}`;
+  const hit = matchTrapToIegs(trap);
+  if (!hit) return `${base} (no page number stored).`;
+  return `${base}: ${formatIegsLocator(hit.topic)}.`;
+}
+
+function locatorLines(hit: IegsHit): string[] {
+  const lines = [`${formatIegsLocator(hit.topic)}.`];
+  if (hit.excerpt) lines.push(formatIegsQuote(hit.excerpt));
+  return lines;
 }
 
 function asksWhere(question: string): boolean {
@@ -328,8 +351,10 @@ function explainFired(trap: AskTrap, req: AskWhyRequest, didFire: boolean): stri
 }
 
 function explainWhere(trap: AskTrap, req: AskWhyRequest): string {
+  const hit = matchIegsText(req.userQuestion) || matchTrapToIegs(trap);
   const fix = cleanFix(trap, req.reference);
   return [
+    ...(hit ? locatorLines(hit) : []),
     standardsPointer(trap),
     `Open that heading for ${trap.code}. ${ensurePeriod(capitalize(angle(trap)))}`,
     spanishJob(trap),
@@ -338,6 +363,44 @@ function explainWhere(trap: AskTrap, req: AskWhyRequest): string {
   ]
     .filter(Boolean)
     .join("\n\n");
+}
+
+function asksIegsStatement(question: string): boolean {
+  return /what does (?:the )?(?:ieg[s]|standards)\b|what do the (?:ieg[s]|standards) say|(?:ieg[s]|standards) say\b/i.test(question);
+}
+
+const CATEGORY_QUESTION: { re: RegExp; category: ErrorCat }[] = [
+  { re: /\bpunctuation\b/i, category: "P" },
+  { re: /\busage\b/i, category: "U" },
+  { re: /\bgrammar\b/i, category: "G" },
+  { re: /\bspelling\b/i, category: "SP" },
+  { re: /\bsyntax\b/i, category: "SYN" },
+];
+
+function explainIegsStatement(trap: AskTrap, req: AskWhyRequest): string {
+  const fromQuestion = matchIegsText(req.userQuestion);
+  const hit = fromQuestion || matchTrapToIegs(trap);
+  if (hit) {
+    const tie = fromQuestion
+      ? "This quotes the indexed IEGS 2025 topic for that question. It does not add a mark."
+      : `For ${trap.code} (${trap.label}), this quotes the indexed IEGS 2025 topic. It does not add a mark.`;
+    return [...locatorLines(hit), tie, scoreSentence(req.displayedPoints)].join("\n\n");
+  }
+  const named = CATEGORY_QUESTION.find((entry) => entry.re.test(req.userQuestion));
+  const related = named ? topicsForCategory(named.category) : [];
+  if (related.length) {
+    const list = related.map((topic) => formatIegsLocator(topic)).join("; ");
+    return [
+      `IEGS 2025 does not give ${CATEGORY_NAME[named!.category].toLowerCase()} a single page. Related topics: ${list}.`,
+      "This note does not add a mark.",
+      scoreSentence(req.displayedPoints),
+    ].join("\n\n");
+  }
+  return [
+    standardsPointer(trap),
+    "No IEGS 2025 page is stored for this question, so this note does not invent one.",
+    scoreSentence(req.displayedPoints),
+  ].join("\n\n");
 }
 
 function explainCompare(anchor: AskTrap, req: AskWhyRequest, pointerFirst: boolean): string {
@@ -546,6 +609,8 @@ function compose(req: AskWhyRequest): string {
   const compare = asksCompare(req.userQuestion);
 
   if (!whyQuiet && compare) return explainCompare(anchor, req, where);
+
+  if (!whyQuiet && asksIegsStatement(req.userQuestion)) return explainIegsStatement(anchor, req);
 
   if (!whyQuiet && where) {
     if (choice.kind === "unarmed") return explainUnarmed(choice.codes, req);

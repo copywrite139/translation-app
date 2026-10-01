@@ -1,5 +1,6 @@
 import { ASK_PRESETS, buildArmedTraps, codesIn, explainAskWhy, parseAskWhyRequest, tutorSentences } from "../lib/askWhy";
 import { getMicro } from "../lib/drills";
+import { IEGS_TOPICS, matchTrapToIegs } from "../lib/iegsIndex";
 import { gradeItem } from "../lib/scoring";
 
 function fail(message: string): never {
@@ -34,7 +35,12 @@ function ask(userQuestion: string) {
   });
 }
 
-for (const preset of ASK_PRESETS) {
+const CORE_PRESETS = ["Why this code?", "What was the Spanish job?", "What's a clean fix?"] as const;
+if (!ASK_PRESETS.includes("Where in IEGS?") || !ASK_PRESETS.includes("What does IEGS say?")) {
+  fail(`missing IEGS chips: ${ASK_PRESETS.join(" | ")}`);
+}
+
+for (const preset of CORE_PRESETS) {
   const answer = ask(preset);
   const sentences = sentencesOf(answer);
   if (sentences.length < 4 || sentences.length > 8) {
@@ -128,6 +134,134 @@ const spellingStray = codesIn(spellingAnswer).filter((code) => !spellingArmed.so
 if (spellingStray.length) fail(`spelling invented ${spellingStray.join(",")}`);
 console.log(`\n--- spelling (${sentencesOf(spellingAnswer).length}) ---\n${spellingAnswer}`);
 
+const capsPage = IEGS_TOPICS.find((topic) => topic.id === "capitalization-titles");
+const commasPage = IEGS_TOPICS.find((topic) => topic.id === "commas");
+const serialPage = IEGS_TOPICS.find((topic) => topic.id === "special-contexts");
+if (capsPage?.page !== 14) fail(`capitalization TOC page ${capsPage?.page}`);
+if (commasPage?.page !== 16) fail(`commas TOC page ${commasPage?.page}`);
+if (serialPage?.page !== 21) fail(`serial-comma TOC page ${serialPage?.page}`);
+for (const topic of IEGS_TOPICS) {
+  for (const excerpt of topic.excerpts || []) {
+    const masked = excerpt.text.replace(/\bU\.S\./g, "US").replace(/\betc\./gi, "etc");
+    const sentences = masked.split(/(?<=[.!?])\s+/).filter(Boolean);
+    if (sentences.length > 2) fail(`${topic.id}/${excerpt.id} excerpt is ${sentences.length} sentences`);
+    if (excerpt.text.length > 500) fail(`${topic.id}/${excerpt.id} excerpt is too long`);
+  }
+}
+
+const titleCaps = spellingArmed.find((row) => row.pitfall === "Lowercase title before a name");
+if (!titleCaps) fail("missing title-before-name trap");
+const titleHit = matchTrapToIegs(titleCaps);
+if (titleHit?.topic.page !== 4 || titleHit.topic.id !== "abbreviated-forms") {
+  fail(`title-before-name mapped to ${titleHit?.topic.id} p.${titleHit?.topic.page}`);
+}
+const titleWhere = explainAskWhy({
+  trap: titleCaps,
+  source: congress.spanish,
+  candidate: "Mexican congressman José Ramírez met with the secretary of state.",
+  reference: congress.english,
+  armedTraps: spellingArmed,
+  userQuestion: "Where in IEGS?",
+  displayedPoints: lower.points,
+});
+if (!titleWhere.startsWith("IEGS 2025 p.4 — Abbreviated forms and titles.")) {
+  fail(`title where did not lead with p.4:\n${titleWhere}`);
+}
+if (!/Such titles are written in initial caps/.test(titleWhere)) fail(`title where missed the quote:\n${titleWhere}`);
+if (!/error category Spelling \(SP\)/.test(titleWhere)) fail(`title where missed the category line:\n${titleWhere}`);
+if (/no page number stored/.test(titleWhere)) fail(`title where hid the page:\n${titleWhere}`);
+if (!new RegExp(`does not change the ${lower.points} error points`).test(titleWhere)) {
+  fail(`title where changed the score story:\n${titleWhere}`);
+}
+if (sentencesOf(titleWhere).length > 8) fail(`title where too long (${sentencesOf(titleWhere).length}):\n${titleWhere}`);
+if (/\b(regrade|rescore)\b/i.test(titleWhere)) fail(`title where tried to rescore:\n${titleWhere}`);
+console.log(`\n--- title where (${sentencesOf(titleWhere).length}) ---\n${titleWhere}`);
+
+const titleWhy = explainAskWhy({
+  trap: titleCaps,
+  source: congress.spanish,
+  candidate: "Mexican congressman José Ramírez met with the secretary of state.",
+  reference: congress.english,
+  armedTraps: spellingArmed,
+  userQuestion: "Why this code?",
+  displayedPoints: lower.points,
+});
+if (!/Spelling/.test(titleWhy) || !titleWhy.includes(titleCaps.code)) fail(`title why missed the fired trap:\n${titleWhy}`);
+if (!/IEGS 2025 p\.4 — Abbreviated forms and titles/.test(titleWhy)) fail(`title why missed the locator:\n${titleWhy}`);
+if (!/congressman/i.test(titleWhy)) fail(`title why missed the fired wording:\n${titleWhy}`);
+if (!new RegExp(`does not change the ${lower.points} error points`).test(titleWhy)) fail(`title why changed the score:\n${titleWhy}`);
+if (sentencesOf(titleWhy).length > 8) fail(`title why too long:\n${titleWhy}`);
+console.log(`\n--- title why (${sentencesOf(titleWhy).length}) ---\n${titleWhy}`);
+
+const natureItem = getMicro("5");
+if (!natureItem) fail("missing item 5");
+const natureCandidate = "Dr. García, head of the cardiology department, published a study in nature magazine.";
+const natureGrade = gradeItem(natureItem, natureCandidate);
+const natureMark = natureGrade.fired.find((mark) => mark.pitfall === "Publication caps");
+if (!natureMark) fail(`expected publication caps, got ${natureGrade.fired.map((mark) => mark.pitfall).join(",")}`);
+const natureArmed = buildArmedTraps(natureItem.traps, natureGrade.fired);
+const natureTrap = natureArmed.find((row) => row.trapId === natureMark.trapId);
+if (!natureTrap) fail("publication trap missing");
+const natureWhere = explainAskWhy({
+  trap: natureTrap,
+  source: natureItem.spanish,
+  candidate: natureCandidate,
+  reference: natureItem.english,
+  armedTraps: natureArmed,
+  userQuestion: "Where in IEGS?",
+  displayedPoints: natureGrade.points,
+});
+if (!natureWhere.startsWith("IEGS 2025 p.14 — Capitalization in headings and titles of works.")) {
+  fail(`publication where page:\n${natureWhere}`);
+}
+if (!/title-case system for book titles/.test(natureWhere)) fail(`publication where missed the quote:\n${natureWhere}`);
+if (/no page number stored/.test(natureWhere)) fail(`publication where hid the page:\n${natureWhere}`);
+const natureUnit = natureGrade.points === 1 ? "error point" : "error points";
+if (!new RegExp(`does not change the ${natureGrade.points} ${natureUnit}`).test(natureWhere)) {
+  fail(`publication where changed the score:\n${natureWhere}`);
+}
+if (sentencesOf(natureWhere).length > 8) fail(`publication where too long (${sentencesOf(natureWhere).length}):\n${natureWhere}`);
+console.log(`\n--- publication where (${sentencesOf(natureWhere).length}) ---\n${natureWhere}`);
+
+const serialAnswer = ask("What does IEGS say about the serial comma?");
+if (!serialAnswer.includes("IEGS 2025 p.21 — Special contexts (serial comma, dates, proper names, places, quotations, parentheses).")) {
+  fail(`serial answer missed p.21:\n${serialAnswer}`);
+}
+if (!/may be either used or omitted unless omission would result in ambiguity or confusion/.test(serialAnswer)) {
+  fail(`serial answer missed the quote:\n${serialAnswer}`);
+}
+if (!/does not add a mark/.test(serialAnswer)) fail(`serial answer invented a mark:\n${serialAnswer}`);
+if (!/does not change the 4 error points already shown/.test(serialAnswer)) fail(`serial answer changed the score:\n${serialAnswer}`);
+if (/\b(regrade|rescore)\b/i.test(serialAnswer)) fail(`serial answer tried to rescore:\n${serialAnswer}`);
+const serialCodes = codesIn(serialAnswer).filter((code) => !armed.some((row) => row.code === code));
+if (serialCodes.length) fail(`serial answer invented ${serialCodes.join(",")}`);
+if (sentencesOf(serialAnswer).length > 8) fail(`serial answer too long:\n${serialAnswer}`);
+console.log(`\n--- serial comma (${sentencesOf(serialAnswer).length}) ---\n${serialAnswer}`);
+
+const noPage = ask("What does IEGS say?");
+if (/\b(?:page|section|p\.)\s*\d+/i.test(noPage)) fail(`transfer IEGS chip invented a page:\n${noPage}`);
+if (!/no page number stored/.test(noPage)) fail(`transfer IEGS chip should keep the empty pointer:\n${noPage}`);
+if (!/does not change the 4 error points/.test(noPage)) fail(`transfer IEGS chip changed the score:\n${noPage}`);
+console.log(`\n--- what IEGS says on transfer (${sentencesOf(noPage).length}) ---\n${noPage}`);
+
+const titleArticle = spellingArmed.find((row) => row.pitfall === "Title-article usage");
+if (!titleArticle || titleArticle.fired) fail("title-article should be armed and quiet on lowercase congressman");
+if (matchTrapToIegs(titleArticle)) fail("title-article usage has no stored IEGS page");
+const titleArticleWhere = explainAskWhy({
+  trap: titleArticle,
+  source: congress.spanish,
+  candidate: "Mexican congressman José Ramírez met with the secretary of state.",
+  reference: congress.english,
+  armedTraps: spellingArmed,
+  userQuestion: "Where in IEGS?",
+  displayedPoints: lower.points,
+});
+if (/\bp\.\d+/.test(titleArticleWhere)) fail(`title-article invented a page:\n${titleArticleWhere}`);
+if (!/no page number stored/.test(titleArticleWhere)) fail(`title-article hid the empty pointer:\n${titleArticleWhere}`);
+if (!new RegExp(`does not change the ${lower.points} error points`).test(titleArticleWhere)) {
+  fail(`title-article where changed the score:\n${titleArticleWhere}`);
+}
+
 function acceptedAsk(body: unknown) {
   const parsed = parseAskWhyRequest(body);
   if (parsed.ok) return parsed.value;
@@ -166,6 +300,14 @@ for (const row of perfect.avoided) {
   if (/\b(regrade|rescore|should be)\b/i.test(answer)) fail(`${row.code} caught answer tried to rescore`);
   const stray = codesIn(answer).filter((code) => !perfectArmed.some((trap) => trap.code === code));
   if (stray.length) fail(`${row.code} caught answer invented ${stray.join(",")}`);
+  const hit = matchTrapToIegs(quiet);
+  if (hit) {
+    if (!answer.includes(`IEGS 2025 p.${hit.topic.page} — ${hit.topic.title}`)) {
+      fail(`${row.code} caught answer missed its locator:\n${answer}`);
+    }
+  } else if (/\bp\.\d+/.test(answer)) {
+    fail(`${row.code} caught answer invented a page:\n${answer}`);
+  }
   console.log(`\n--- caught ${row.code} (${sentences.length}) ---\n${answer}`);
 }
 
