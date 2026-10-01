@@ -1,4 +1,4 @@
-import { ASK_PRESETS, buildArmedTraps, codesIn, explainAskWhy, tutorSentences } from "../lib/askWhy";
+import { ASK_PRESETS, buildArmedTraps, codesIn, explainAskWhy, parseAskWhyRequest, tutorSentences } from "../lib/askWhy";
 import { getMicro } from "../lib/drills";
 import { gradeItem } from "../lib/scoring";
 
@@ -127,5 +127,93 @@ if (sentencesOf(spellingAnswer).length > 8) fail(`spelling answer too long:\n${s
 const spellingStray = codesIn(spellingAnswer).filter((code) => !spellingArmed.some((row) => row.code === code));
 if (spellingStray.length) fail(`spelling invented ${spellingStray.join(",")}`);
 console.log(`\n--- spelling (${sentencesOf(spellingAnswer).length}) ---\n${spellingAnswer}`);
+
+function acceptedAsk(body: unknown) {
+  const parsed = parseAskWhyRequest(body);
+  if (parsed.ok) return parsed.value;
+  throw new Error((parsed as { error: string }).error);
+}
+
+const perfect = gradeItem(congress, congress.english);
+if (!perfect.perfect || perfect.points !== 0 || perfect.fired.length !== 0) {
+  fail(`congress key should be perfect with nothing missed, got ${perfect.points} ${perfect.verdict}`);
+}
+if (!perfect.avoided.length) fail("perfect grade should list caught traps");
+const perfectArmed = buildArmedTraps(congress.traps, perfect.fired);
+for (const row of perfect.avoided) {
+  const quiet = perfectArmed.find((trap) => trap.trapId === row.trapId);
+  if (!quiet || quiet.fired) fail(`${row.code} should be armed and quiet`);
+  if (quiet.code !== row.code) fail(`${row.trapId} code ${quiet.code} != ${row.code}`);
+  const answer = explainAskWhy(
+    acceptedAsk({
+      trap: quiet,
+      source: congress.spanish,
+      candidate: congress.english,
+      reference: congress.english,
+      armedTraps: perfectArmed,
+      userQuestion: "Why this code?",
+      displayedPoints: perfect.points,
+    })
+  );
+  const sentences = sentencesOf(answer);
+  if (sentences.length < 4 || sentences.length > 8) fail(`${row.code} caught sentence count ${sentences.length}: ${answer}`);
+  if (!/was armed and did not fire/.test(answer)) fail(`${row.code} caught answer missed the quiet fact:\n${answer}`);
+  if (!/Spanish job:/.test(answer)) fail(`${row.code} caught answer missed the Spanish job:\n${answer}`);
+  if (!/What English allows:/.test(answer)) fail(`${row.code} caught answer missed what English allows:\n${answer}`);
+  if (!/IEGS\/ATA:/.test(answer)) fail(`${row.code} caught answer missed the IEGS angle:\n${answer}`);
+  if (!/One clean fix:/.test(answer)) fail(`${row.code} caught answer missed the clean example:\n${answer}`);
+  if (!/does not change the 0 error points already shown/.test(answer)) fail(`${row.code} caught answer changed the score:\n${answer}`);
+  if (/\b(regrade|rescore|should be)\b/i.test(answer)) fail(`${row.code} caught answer tried to rescore`);
+  const stray = codesIn(answer).filter((code) => !perfectArmed.some((trap) => trap.code === code));
+  if (stray.length) fail(`${row.code} caught answer invented ${stray.join(",")}`);
+  console.log(`\n--- caught ${row.code} (${sentences.length}) ---\n${answer}`);
+}
+
+const unknown = parseAskWhyRequest({
+  trap: { ...perfectArmed[0], trapId: "not-a-trap", fired: false },
+  source: congress.spanish,
+  candidate: congress.english,
+  armedTraps: perfectArmed,
+  userQuestion: "Why this code?",
+  displayedPoints: 0,
+});
+if (unknown.ok) fail("unknown quiet trap should be rejected");
+else if (!/not on the armed list/.test((unknown as { error: string }).error)) {
+  fail(`unknown quiet trap error: ${(unknown as { error: string }).error}`);
+}
+
+const lied = parseAskWhyRequest({
+  trap: { ...perfectArmed[0], fired: true },
+  source: congress.spanish,
+  candidate: congress.english,
+  armedTraps: perfectArmed,
+  userQuestion: "Why this code?",
+  displayedPoints: 0,
+});
+if (lied.ok) fail("a quiet trap marked fired should be rejected");
+
+if (!lower.fired.length) fail("bad congress grade should miss a trap");
+const missed = spellingArmed.find((trap) => trap.fired);
+if (!missed) fail("bad grade armed packet should include a fired trap");
+acceptedAsk({
+  trap: missed,
+  source: congress.spanish,
+  candidate: "Mexican congressman José Ramírez met with the secretary of state.",
+  reference: congress.english,
+  armedTraps: spellingArmed,
+  userQuestion: "Why this code?",
+  displayedPoints: lower.points,
+});
+const stillCaught = spellingArmed.find((trap) => !trap.fired);
+if (!stillCaught) fail("bad grade should still have a caught trap");
+acceptedAsk({
+  trap: stillCaught,
+  source: congress.spanish,
+  candidate: "Mexican congressman José Ramírez met with the secretary of state.",
+  reference: congress.english,
+  armedTraps: spellingArmed,
+  userQuestion: "Why this code?",
+  displayedPoints: lower.points,
+});
 
 console.log("\nask-why ok");

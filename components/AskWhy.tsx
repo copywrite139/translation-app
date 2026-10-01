@@ -32,9 +32,9 @@ export function AskWhy(props: {
     setError(null);
     try {
       const armedTraps = buildArmedTraps(props.traps, props.fired);
-      const trap = armedTraps.find((row) => row.trapId === props.mark.trapId && row.fired);
+      const trap = armedTraps.find((row) => row.trapId === props.mark.trapId);
       if (!trap) {
-        setError("This row is not a fired trap.");
+        setError("This row is not an armed trap.");
         return;
       }
       const body: AskWhyRequest = {
