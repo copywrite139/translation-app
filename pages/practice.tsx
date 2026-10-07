@@ -15,6 +15,7 @@ import {
   weakestCategory,
   Ledger,
 } from "../lib/ledger";
+import { orderPracticeItems } from "../lib/practiceOrder";
 import { gradeItem, patternNote, wordCount, GradeResult } from "../lib/scoring";
 import { DrillItem, ErrorCat } from "../lib/types";
 
@@ -47,9 +48,27 @@ function formatClock(seconds: number): string {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
+const ORDER_SEED_KEY = "ata-practice-order-seed";
+
+/** Stable for this tab. A new session, or a cleared session, gets a new shuffle. */
+function practiceSessionSeed(): string {
+  if (typeof window === "undefined") return "ssr";
+  try {
+    const existing = window.sessionStorage.getItem(ORDER_SEED_KEY);
+    if (existing) return existing;
+    const created = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    window.sessionStorage.setItem(ORDER_SEED_KEY, created);
+    return created;
+  } catch {
+    return "session";
+  }
+}
+
 export default function Practice() {
   const router = useRouter();
   const sessionId = useRef(`micro-${Date.now()}`);
+  const orderSeed = useRef("");
+  const queueHold = useRef<{ key: string; items: DrillItem[] } | null>(null);
   const [ledger, setLedger] = useState<Ledger | null>(null);
   const [index, setIndex] = useState(0);
   const [text, setText] = useState("");
@@ -76,29 +95,58 @@ export default function Practice() {
 
   const queue = useMemo(() => {
     if (!router.isReady || !ledger) return [];
+    if (itemId) {
+      queueHold.current = null;
+      if (privateSession) return privateItems.filter((item) => item.gated && item.id === itemId);
+      return selectMicros({
+        bank,
+        count: Number.isFinite(count) && count > 0 ? count : 5,
+        itemId,
+        heat: trapHeat(ledger),
+        weakest: weakestCategory(ledger),
+      });
+    }
+
+    const holdKey = privateSession
+      ? `private|${shape ?? ""}|${focus ?? ""}|${countParam ?? ""}|${privateItems.map((item) => item.id).join(",")}`
+      : bank
+        ? `bank|${bank}|${count}|${countParam ?? ""}`
+        : "core";
+    if (queueHold.current?.key === holdKey) return queueHold.current.items;
+
+    if (!orderSeed.current) orderSeed.current = practiceSessionSeed();
+    const seed = `${orderSeed.current}:${dayKey(new Date())}:${holdKey}`;
+    const seenIds = ledger.events.map((event) => event.itemId);
+    const heat = trapHeat(ledger);
+
+    let items: DrillItem[];
     if (privateSession) {
       let pool = privateItems.filter((item) => item.gated);
-      if (itemId) return pool.filter((item) => item.id === itemId);
       if (shape === "sentence" || shape === "short-paragraph") {
         pool = pool.filter((item) => item.microShape === shape);
       }
       if (focus) pool = pool.filter((item) => item.focus.includes(focus));
-      if (countParam && Number.isFinite(count) && count > 0) pool = pool.slice(0, count);
-      return pool;
+      items = orderPracticeItems(pool, { seed, heat, seenIds });
+      if (countParam && Number.isFinite(count) && count > 0) items = items.slice(0, count);
+    } else if (!bank) {
+      items = orderPracticeItems(corePractice(), { seed, heat, seenIds });
+    } else {
+      const today = todayMarks(ledger, new Date());
+      items = selectMicros({
+        bank,
+        count: Number.isFinite(count) && count > 0 ? count : 5,
+        heat,
+        weakest: weakestCategory(ledger),
+        todayTrapIds: today.map((m) => m.trapId),
+        todayPitfalls: today.map((m) => m.pitfall),
+        todayLemmas: today.map((m) => m.lemma || ""),
+        todayCategories: today.map((m) => m.category as ErrorCat),
+        orderSeed: seed,
+        seenIds,
+      });
     }
-    if (!bank && !itemId) return corePractice();
-    const today = todayMarks(ledger, new Date());
-    return selectMicros({
-      bank,
-      count: Number.isFinite(count) && count > 0 ? count : 5,
-      itemId,
-      heat: trapHeat(ledger),
-      weakest: weakestCategory(ledger),
-      todayTrapIds: today.map((m) => m.trapId),
-      todayPitfalls: today.map((m) => m.pitfall),
-      todayLemmas: today.map((m) => m.lemma || ""),
-      todayCategories: today.map((m) => m.category as ErrorCat),
-    });
+    queueHold.current = { key: holdKey, items };
+    return items;
   }, [router.isReady, ledger, bank, count, countParam, itemId, privateSession, privateItems, shape, focus]);
 
   useEffect(() => {
@@ -257,43 +305,29 @@ export default function Practice() {
         {minutes ? ` · ${minutes} min` : ""}
       </h2>
       <p>
-        <Link href="/practice">The 15</Link>
-        {" · "}
-        <Link href="/practice?bank=P&minutes=10">10-min P</Link>
-        {" · "}
-        <Link href="/practice?bank=O&minutes=10">10-min O</Link>
-        {" · "}
-        <Link href="/practice?bank=POS&minutes=10">POS</Link>
-        {" · "}
-        <Link href="/passage?minutes=90">90-min passage</Link>
-        {" · "}
-        <Link href="/">Today</Link>
+        <Link href="/">Home</Link>
       </p>
-      {privateAccess === "open" && privateItems.length ? (
+      {privateSession && privateAccess === "open" && privateItems.length ? (
         <p>
-          <Link href="/practice?bank=private">{PRIVATE_LABEL}</Link>
-          {" · "}
           <Link href={privateHref({ shape: "sentence", focus: focus || "" })}>Sentence</Link>
           {" · "}
           <Link href={privateHref({ shape: "short-paragraph", focus: focus || "" })}>Short paragraph</Link>
-          {privateSession ? (
-            <label style={{ marginLeft: "0.6rem" }}>
-              Focus{" "}
-              <select
-                value={focus || ""}
-                onChange={(event) => {
-                  router.push(privateHref({ focus: event.target.value }));
-                }}
-              >
-                <option value="">All traps</option>
-                {privateTags.map((tag) => (
-                  <option key={tag} value={tag}>
-                    {FOCUS_LABEL[tag] || tag}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : null}
+          <label style={{ marginLeft: "0.6rem" }}>
+            Focus{" "}
+            <select
+              value={focus || ""}
+              onChange={(event) => {
+                router.push(privateHref({ focus: event.target.value }));
+              }}
+            >
+              <option value="">All traps</option>
+              {privateTags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {FOCUS_LABEL[tag] || tag}
+                </option>
+              ))}
+            </select>
+          </label>
         </p>
       ) : null}
       {privateAccess === "email" ? (

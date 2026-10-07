@@ -1,0 +1,2939 @@
+[
+  {
+    "id": "orig-001",
+    "bank": "U",
+    "domain": "politics",
+    "level": "B2",
+    "mode": "sentence",
+    "spanish_text": "El actual alcalde de Barranquilla aseguró que el contrato del alumbrado público no se renovó por falta de recursos y no por presiones políticas, como pretenden sus opositores.",
+    "focus_traps": [
+      "false-friends",
+      "pos-syntax"
+    ],
+    "focus": [
+      "False friend actual",
+      "False friend pretender",
+      "Dropped contrast"
+    ],
+    "errors_to_catch": [
+      "actual rendered as actual (≠ current)",
+      "pretenden rendered as pretend (≠ claim)",
+      "no por presiones políticas contrast lost"
+    ],
+    "why_this_chunk": "Two textbook false friends (actual, pretender) inside a normal city-hall news sentence, plus a polarity contrast that is easy to flatten.",
+    "suggested_ok_english_hint": "The current mayor … not renewed for lack of funds … as his opponents claim/allege.",
+    "english_key": "The current mayor of Barranquilla said the street lighting contract was not renewed because of a lack of funds, not because of political pressure, as his opponents claim.",
+    "acceptables": [],
+    "traps": [
+      {
+        "id": "orig-001-actual",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "actual mayor"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "actual = current / present. 'Actual mayor' means the real one, which changes the meaning.",
+        "ok": "The current mayor",
+        "no": "The actual mayor",
+        "pitfall": "False friend actual",
+        "label": "actual rendered as actual (≠ current)",
+        "lemma": "actual"
+      },
+      {
+        "id": "orig-001-pretenden",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bpretend(s|ed|ing)?\\b",
+          "flags": "i"
+        },
+        "comment": "pretender here = claim / maintain / would have people believe. 'Pretend' means to feign.",
+        "ok": "as his opponents claim",
+        "no": "as his opponents pretend",
+        "pitfall": "False friend pretender",
+        "label": "pretenden rendered as pretend (≠ claim)",
+        "lemma": "pretender"
+      },
+      {
+        "id": "orig-001-polarity",
+        "family": "pos-syntax",
+        "category": "O",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "not because",
+            "rather than",
+            "and not",
+            "not due to",
+            "not political"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "The source contrasts two causes (lack of funds, NOT political pressure). Dropping the 'not' half reverses or loses the claim.",
+        "ok": "not because of political pressure",
+        "pitfall": "Dropped contrast",
+        "label": "no por presiones políticas contrast lost",
+        "lemma": "no por"
+      }
+    ],
+    "approx_word_count": 28,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-002",
+    "bank": "U",
+    "domain": "agriculture-news",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "Según la federación, el suceso que más afectó a los pequeños caficultores del Huila este año fue la helada de julio, que dejó cosechas enteras sin valor comercial.",
+    "focus_traps": [
+      "false-friends",
+      "technical-precision",
+      "regional-lexicon"
+    ],
+    "focus": [
+      "False friend suceso",
+      "Weather term helada",
+      "Regional agri term"
+    ],
+    "errors_to_catch": [
+      "suceso rendered as success",
+      "helada not rendered as frost/freeze",
+      "caficultores → coffee growers"
+    ],
+    "why_this_chunk": "suceso→success is a high-frequency T error; helada and caficultores add Colombian agri lexicon.",
+    "suggested_ok_english_hint": "…the event/incident that hit small coffee growers in Huila hardest … the July frost …",
+    "english_key": "According to the federation, the event that hit small coffee growers in Huila hardest this year was the July frost, which left entire harvests with no commercial value.",
+    "acceptables": [],
+    "traps": [
+      {
+        "id": "orig-002-suceso",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 8,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bsuccess",
+          "flags": "i"
+        },
+        "comment": "suceso = event / incident. 'Success' is éxito. This inverts the meaning of the sentence.",
+        "ok": "the event that hit …",
+        "no": "the success that most affected …",
+        "pitfall": "False friend suceso",
+        "label": "suceso rendered as success",
+        "lemma": "suceso"
+      },
+      {
+        "id": "orig-002-helada",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "frost",
+            "freeze",
+            "cold snap"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "helada = frost / freeze (crop damage), not 'ice cream' or 'ice'.",
+        "ok": "the July frost",
+        "no": "the July ice",
+        "pitfall": "Weather term helada",
+        "label": "helada not rendered as frost/freeze",
+        "lemma": "helada"
+      },
+      {
+        "id": "orig-002-caficultores",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "coffee growers",
+            "coffee farmers",
+            "coffee producers"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "caficultores = coffee growers/farmers. Keep the coffee sense; 'small farmers' alone drops it.",
+        "ok": "small coffee growers",
+        "no": "small farmers",
+        "pitfall": "Regional agri term",
+        "label": "caficultores → coffee growers",
+        "lemma": "caficultor"
+      }
+    ],
+    "approx_word_count": 28,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-003",
+    "bank": "U",
+    "domain": "education",
+    "level": "B1",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "Mi hija terminó el colegio en Bucaramanga y ahora estudia la carrera de Derecho en una universidad pública; dice que la facultad exige mucha más lectura de la que imaginaba.",
+    "focus_traps": [
+      "false-friends"
+    ],
+    "focus": [
+      "False friend colegio",
+      "False friend carrera",
+      "False friend lectura"
+    ],
+    "errors_to_catch": [
+      "colegio rendered as college",
+      "carrera rendered as career",
+      "lectura rendered as lecture"
+    ],
+    "why_this_chunk": "Three education false friends in one natural sentence (colegio, carrera, lectura) — the classic US-target cluster.",
+    "suggested_ok_english_hint": "…finished high school … is studying law … much more reading than she expected.",
+    "english_key": "My daughter finished high school in Bucaramanga and is now studying law at a public university; she says the law school requires much more reading than she imagined.",
+    "acceptables": [
+      "My daughter graduated from high school in Bucaramanga and is now studying law at a public university; she says the school requires much more reading than she imagined."
+    ],
+    "traps": [
+      {
+        "id": "orig-003-colegio",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bcollege\\b",
+          "flags": "i"
+        },
+        "comment": "colegio = (primary/secondary) school; terminar el colegio = finish high school. 'College' is university-level in US English.",
+        "ok": "finished high school",
+        "no": "finished college",
+        "pitfall": "False friend colegio",
+        "label": "colegio rendered as college",
+        "lemma": "colegio"
+      },
+      {
+        "id": "orig-003-carrera",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bcareer\\b",
+          "flags": "i"
+        },
+        "comment": "estudiar la carrera de Derecho = study law / be in a law degree program. 'Career' is a working life.",
+        "ok": "is studying law",
+        "no": "is studying the career of law",
+        "pitfall": "False friend carrera",
+        "label": "carrera rendered as career",
+        "lemma": "carrera"
+      },
+      {
+        "id": "orig-003-lectura",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\blectures?\\b",
+          "flags": "i"
+        },
+        "comment": "lectura = reading. A lecture is a clase magistral / conferencia.",
+        "ok": "much more reading",
+        "no": "many more lectures",
+        "pitfall": "False friend lectura",
+        "label": "lectura rendered as lecture",
+        "lemma": "lectura"
+      }
+    ],
+    "approx_word_count": 30,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-004",
+    "bank": "U",
+    "domain": "public-services",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "La decepción de los vecinos fue evidente cuando la empresa de acueducto avisó, con apenas un día de anticipación, que suspendería el servicio de agua todo el fin de semana.",
+    "focus_traps": [
+      "false-friends",
+      "regional-lexicon"
+    ],
+    "focus": [
+      "False friend decepción",
+      "False friend avisar",
+      "Regional lexicon acueducto"
+    ],
+    "errors_to_catch": [
+      "decepción rendered as deception",
+      "avisó rendered as advised",
+      "empresa de acueducto rendered as aqueduct"
+    ],
+    "why_this_chunk": "decepción / avisar are frequent FF hits; empresa de acueducto is Colombian utility lexicon that tempts 'aqueduct company'.",
+    "suggested_ok_english_hint": "Residents' disappointment … the water utility gave notice, only a day in advance, …",
+    "english_key": "Residents' disappointment was obvious when the water utility announced, with only one day's notice, that it would cut off water service for the entire weekend.",
+    "acceptables": [
+      "The residents' disappointment was obvious when the water company announced, with only one day's notice, that it would cut off water service for the entire weekend."
+    ],
+    "traps": [
+      {
+        "id": "orig-004-decepcion",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bdecepti",
+          "flags": "i"
+        },
+        "comment": "decepción = disappointment. 'Deception' is engaño.",
+        "ok": "disappointment",
+        "no": "deception",
+        "pitfall": "False friend decepción",
+        "label": "decepción rendered as deception",
+        "lemma": "decepción"
+      },
+      {
+        "id": "orig-004-avisar",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\badvised\\b",
+          "flags": "i"
+        },
+        "comment": "avisar = notify / announce / let people know. 'Advised' implies recommending.",
+        "ok": "announced / notified",
+        "no": "advised",
+        "pitfall": "False friend avisar",
+        "label": "avisó rendered as advised",
+        "lemma": "avisar"
+      },
+      {
+        "id": "orig-004-acueducto",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\baqueduct",
+          "flags": "i"
+        },
+        "comment": "In Colombia la empresa de acueducto = the water utility / water company. 'Aqueduct' suggests a Roman structure.",
+        "ok": "the water utility",
+        "no": "the aqueduct company",
+        "pitfall": "Regional lexicon acueducto",
+        "label": "empresa de acueducto rendered as aqueduct",
+        "lemma": "acueducto"
+      }
+    ],
+    "approx_word_count": 30,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-005",
+    "bank": "U",
+    "domain": "local-government",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "Durante la sesión, los concejales discutieron por más de tres horas la posibilidad de implementar un cobro por congestión en el centro histórico de Cartagena; al final, la propuesta fue aplazada sin votación.",
+    "focus_traps": [
+      "false-friends",
+      "us-spelling"
+    ],
+    "focus": [
+      "False friend discutir",
+      "Outcome verb aplazar",
+      "US spelling"
+    ],
+    "errors_to_catch": [
+      "discutieron rendered as argued",
+      "aplazada not rendered as postponed",
+      "centre for center"
+    ],
+    "why_this_chunk": "discutir/aplazar are FF-adjacent verbs whose wrong choice changes the outcome; adds a policy term.",
+    "suggested_ok_english_hint": "…council members debated … a congestion charge … the proposal was postponed without a vote.",
+    "english_key": "During the session, council members debated for more than three hours the possibility of introducing a congestion charge in Cartagena's historic center; in the end, the proposal was postponed without a vote.",
+    "acceptables": [],
+    "traps": [
+      {
+        "id": "orig-005-discutir",
+        "family": "false-friends",
+        "category": "U",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bargued\\b(?!\\s+(for|that|over))",
+          "flags": "i"
+        },
+        "comment": "discutir in a council session = debate / discuss. Bare 'argued' reads as quarreling.",
+        "ok": "debated / discussed",
+        "no": "the council members argued for three hours",
+        "pitfall": "False friend discutir",
+        "label": "discutieron rendered as argued",
+        "lemma": "discutir"
+      },
+      {
+        "id": "orig-005-aplazada",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 8,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "postponed",
+            "deferred",
+            "put off",
+            "delayed",
+            "shelved",
+            "tabled"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "aplazada = postponed. 'Approved' or 'applauded' reverses the outcome.",
+        "ok": "the proposal was postponed",
+        "no": "the proposal was approved",
+        "pitfall": "Outcome verb aplazar",
+        "label": "aplazada not rendered as postponed",
+        "lemma": "aplazar"
+      },
+      {
+        "id": "orig-005-center",
+        "family": "us-spelling",
+        "category": "SP",
+        "weight": 1,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bcentre\\b",
+          "flags": "i"
+        },
+        "comment": "US target: center, not centre.",
+        "ok": "historic center",
+        "no": "historic centre",
+        "pitfall": "US spelling",
+        "label": "centre for center"
+      }
+    ],
+    "approx_word_count": 33,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-006",
+    "bank": "U",
+    "domain": "labor",
+    "level": "B2",
+    "mode": "sentence",
+    "spanish_text": "La convocatoria exige que las y los docentes presenten su título profesional y una constancia de experiencia laboral antes del 15 de noviembre.",
+    "focus_traps": [
+      "false-friends",
+      "pos-syntax"
+    ],
+    "focus": [
+      "False friend convocatoria",
+      "False friend constancia",
+      "Gendered doubling calqued"
+    ],
+    "errors_to_catch": [
+      "convocatoria rendered as convocation",
+      "constancia rendered as constancy",
+      "las y los docentes calqued"
+    ],
+    "why_this_chunk": "Inclusive doubling (las y los docentes) plus three paperwork false friends: convocatoria, título, constancia.",
+    "suggested_ok_english_hint": "The call for applications requires teachers to submit their degree and a letter/certificate of experience by November 15.",
+    "english_key": "The call for applications requires teachers to submit their professional degree and a certificate of work experience by November 15.",
+    "acceptables": [
+      "The call for applications requires teachers to submit their professional degree and proof of work experience by November 15."
+    ],
+    "traps": [
+      {
+        "id": "orig-006-convocatoria",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bconvocation\\b",
+          "flags": "i"
+        },
+        "comment": "convocatoria = call for applications / hiring call / open competition. A convocation is a ceremony or assembly.",
+        "ok": "the call for applications",
+        "no": "the convocation",
+        "pitfall": "False friend convocatoria",
+        "label": "convocatoria rendered as convocation",
+        "lemma": "convocatoria"
+      },
+      {
+        "id": "orig-006-constancia",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bconstancy\\b",
+          "flags": "i"
+        },
+        "comment": "constancia = certificate / letter / proof. Constancy is perseverance.",
+        "ok": "a certificate of work experience",
+        "no": "a constancy of experience",
+        "pitfall": "False friend constancia",
+        "label": "constancia rendered as constancy",
+        "lemma": "constancia"
+      },
+      {
+        "id": "orig-006-inclusive",
+        "family": "pos-syntax",
+        "category": "U",
+        "weight": 1,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "male and female teachers",
+            "female and male teachers",
+            "the and the teachers"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "Spanish doubles the article for inclusivity; natural US English uses the gender-neutral noun (teachers).",
+        "ok": "teachers",
+        "no": "male and female teachers",
+        "pitfall": "Gendered doubling calqued",
+        "label": "las y los docentes calqued"
+      }
+    ],
+    "approx_word_count": 23,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-007",
+    "bank": "U",
+    "domain": "education",
+    "level": "B1",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "Más de dos mil jóvenes aplicaron a la beca de la gobernación, pero solo 150 la obtuvieron; los demás podrán volver a postularse en el siguiente ciclo.",
+    "focus_traps": [
+      "register",
+      "institutions-headlines",
+      "numbers-separators"
+    ],
+    "focus": [
+      "Preposition with apply",
+      "Institution gobernación",
+      "Number omitted"
+    ],
+    "errors_to_catch": [
+      "applied to the scholarship (≠ applied for)",
+      "gobernación omitted or mistranslated",
+      "dos mil lost"
+    ],
+    "why_this_chunk": "U-bank preposition trap (apply FOR a scholarship), a quantity, and Colombian gobernación.",
+    "suggested_ok_english_hint": "More than 2,000 young people applied for the … scholarship … the rest can reapply next cycle.",
+    "english_key": "More than 2,000 young people applied for the provincial government scholarship, but only 150 received it; the rest will be able to reapply in the next cycle.",
+    "acceptables": [
+      "More than 2,000 young people applied for the governor's office scholarship, but only 150 got it; the rest will be able to reapply in the next cycle."
+    ],
+    "traps": [
+      {
+        "id": "orig-007-applyfor",
+        "family": "register",
+        "category": "U",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bapplied\\s+(to|at)\\s+(the|a)\\s+[\\w-]*\\s*scholarship",
+          "flags": "i"
+        },
+        "comment": "In US English you apply FOR a scholarship/grant (apply TO a school).",
+        "ok": "applied for the scholarship",
+        "no": "applied to the scholarship",
+        "pitfall": "Preposition with apply",
+        "label": "applied to the scholarship (≠ applied for)",
+        "lemma": "aplicar"
+      },
+      {
+        "id": "orig-007-gobernacion",
+        "family": "institutions-headlines",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "provincial",
+            "department",
+            "departmental",
+            "governor",
+            "state government",
+            "regional government"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "gobernación = the departmental (provincial/state-level) government. Dropping it loses who funds the scholarship.",
+        "ok": "the provincial government scholarship",
+        "no": "the government scholarship",
+        "pitfall": "Institution gobernación",
+        "label": "gobernación omitted or mistranslated",
+        "lemma": "gobernación"
+      },
+      {
+        "id": "orig-007-numbers",
+        "family": "numbers-separators",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_pattern",
+          "pattern": "(2,000|two thousand)",
+          "flags": "i"
+        },
+        "comment": "dos mil must come through as 2,000 / two thousand.",
+        "ok": "More than 2,000",
+        "no": "Many young people",
+        "pitfall": "Number omitted",
+        "label": "dos mil lost"
+      }
+    ],
+    "approx_word_count": 27,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-008",
+    "bank": "U",
+    "domain": "labor-politics",
+    "level": "B2",
+    "mode": "sentence",
+    "spanish_text": "El Gobierno radicó ante el Congreso un proyecto de ley que reduciría gradualmente la jornada laboral de 48 a 42 horas semanales, sin disminución del salario.",
+    "focus_traps": [
+      "false-friends",
+      "us-spelling"
+    ],
+    "focus": [
+      "False friend radicar",
+      "Calque proyecto de ley",
+      "US spelling"
+    ],
+    "errors_to_catch": [
+      "radicó calqued",
+      "proyecto de ley rendered as law project",
+      "labour for labor"
+    ],
+    "why_this_chunk": "radicar / proyecto de ley / jornada laboral are LatAm legislative staples that get calqued.",
+    "suggested_ok_english_hint": "The government submitted/filed a bill … reduce the workweek from 48 to 42 hours … with no pay cut.",
+    "english_key": "The government filed a bill in Congress that would gradually reduce the workweek from 48 to 42 hours, with no cut in pay.",
+    "acceptables": [
+      "The government submitted a bill to Congress that would gradually cut the workweek from 48 to 42 hours without reducing wages."
+    ],
+    "traps": [
+      {
+        "id": "orig-008-radico",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\b(radicated|rooted|radicali[sz]ed)\\b",
+          "flags": "i"
+        },
+        "comment": "radicar un proyecto = file / submit / introduce a bill.",
+        "ok": "filed a bill in Congress",
+        "no": "radicated a project",
+        "pitfall": "False friend radicar",
+        "label": "radicó calqued",
+        "lemma": "radicar"
+      },
+      {
+        "id": "orig-008-bill",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\b(law project|project of law|legislative project)\\b",
+          "flags": "i"
+        },
+        "comment": "proyecto de ley = bill.",
+        "ok": "a bill",
+        "no": "a law project",
+        "pitfall": "Calque proyecto de ley",
+        "label": "proyecto de ley rendered as law project",
+        "lemma": "proyecto de ley"
+      },
+      {
+        "id": "orig-008-labour",
+        "family": "us-spelling",
+        "category": "SP",
+        "weight": 1,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\blabour\\b",
+          "flags": "i"
+        },
+        "comment": "US target: labor, not labour.",
+        "ok": "labor",
+        "no": "labour",
+        "pitfall": "US spelling",
+        "label": "labour for labor"
+      }
+    ],
+    "approx_word_count": 26,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-009",
+    "bank": "POS",
+    "domain": "housing-finance",
+    "level": "C1",
+    "region": "AR",
+    "mode": "sentence",
+    "spanish_text": "En Rosario, muchos inquilinos ya no pagan el alquiler en pesos: el propietario exige dólares billete, y las expensas del edificio se ajustan cada tres meses según el índice de precios.",
+    "focus_traps": [
+      "regional-lexicon",
+      "technical-precision"
+    ],
+    "focus": [
+      "Regional lexicon expensas",
+      "Regional lexicon dólares billete",
+      "Indexation term"
+    ],
+    "errors_to_catch": [
+      "expensas rendered as expenses",
+      "dólares billete flattened to dollars",
+      "índice de precios lost"
+    ],
+    "why_this_chunk": "Argentine housing lexicon (expensas, dólares billete) where the cognate guess is wrong.",
+    "suggested_ok_english_hint": "…tenants … landlords demand cash (US) dollars … the building's maintenance/HOA fees …",
+    "english_key": "In Rosario, many tenants no longer pay rent in pesos: landlords demand cash dollars, and the building's maintenance fees are adjusted every three months based on the price index.",
+    "acceptables": [
+      "In Rosario, many tenants no longer pay their rent in pesos: the owner demands US dollar bills, and the building's maintenance fees are adjusted every three months according to the price index."
+    ],
+    "traps": [
+      {
+        "id": "orig-009-expensas",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bexpenses\\b",
+          "flags": "i"
+        },
+        "comment": "Argentina: expensas = building maintenance fees / HOA dues, not generic 'expenses'.",
+        "ok": "the building's maintenance fees",
+        "no": "the building's expenses",
+        "pitfall": "Regional lexicon expensas",
+        "label": "expensas rendered as expenses",
+        "lemma": "expensas"
+      },
+      {
+        "id": "orig-009-billete",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "cash",
+            "bills",
+            "banknotes",
+            "paper dollars",
+            "physical dollars"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "dólares billete = physical US dollar bills (cash), as opposed to dollars in an account.",
+        "ok": "cash dollars",
+        "no": "dollars",
+        "pitfall": "Regional lexicon dólares billete",
+        "label": "dólares billete flattened to dollars",
+        "lemma": "dólar billete"
+      },
+      {
+        "id": "orig-009-index",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "price index",
+            "consumer price index",
+            "CPI",
+            "inflation index"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "índice de precios = price index (indexation mechanism). Don't paraphrase it away.",
+        "ok": "based on the price index",
+        "no": "depending on prices",
+        "pitfall": "Indexation term",
+        "label": "índice de precios lost"
+      }
+    ],
+    "approx_word_count": 31,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-010",
+    "bank": "POS",
+    "domain": "labor",
+    "level": "C1",
+    "region": "AR",
+    "mode": "sentence",
+    "spanish_text": "El aguinaldo llega en junio y diciembre, pero para quienes trabajan como monotributistas no existe: cobran contra factura y, si se enferman, simplemente no facturan.",
+    "focus_traps": [
+      "regional-lexicon"
+    ],
+    "focus": [
+      "Regional lexicon aguinaldo",
+      "Regional lexicon monotributista",
+      "Untranslated coinage"
+    ],
+    "errors_to_catch": [
+      "aguinaldo left untranslated/unexplained",
+      "monotributistas calqued",
+      "monotribut- left in English"
+    ],
+    "why_this_chunk": "Two Argentine labor terms with no one-word US equivalent; tests explanation vs. calque.",
+    "suggested_ok_english_hint": "The extra month's pay/semiannual bonus … self-employed (simplified-tax) contractors … paid on invoice …",
+    "english_key": "The extra month's pay arrives in June and December, but for people who work as self-employed contractors it does not exist: they get paid when they invoice, and if they get sick, they simply don't bill.",
+    "acceptables": [
+      "The year-end bonus comes in June and December, but for those who work as self-employed contractors it doesn't exist: they are paid against invoices and, if they get sick, they simply don't invoice."
+    ],
+    "traps": [
+      {
+        "id": "orig-010-aguinaldo",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "bonus",
+            "extra month",
+            "thirteenth",
+            "13th",
+            "extra pay"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "aguinaldo = mandatory extra month's salary paid in two installments (June/December). Leaving 'aguinaldo' bare is opaque to a US reader.",
+        "ok": "the semiannual bonus / extra month's pay",
+        "no": "The aguinaldo arrives",
+        "pitfall": "Regional lexicon aguinaldo",
+        "label": "aguinaldo left untranslated/unexplained",
+        "lemma": "aguinaldo"
+      },
+      {
+        "id": "orig-010-monotributo",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "self-employed",
+            "independent contractor",
+            "freelance",
+            "contractors",
+            "freelancers"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "monotributistas = self-employed workers under Argentina's simplified tax regime. 'Monotributists' is not English.",
+        "ok": "self-employed contractors",
+        "no": "monotributists",
+        "pitfall": "Regional lexicon monotributista",
+        "label": "monotributistas calqued",
+        "lemma": "monotributista"
+      },
+      {
+        "id": "orig-010-calque",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bmonotribut",
+          "flags": "i"
+        },
+        "comment": "Do not leave the coined term in English text without a gloss.",
+        "ok": "self-employed",
+        "no": "monotributistas",
+        "pitfall": "Untranslated coinage",
+        "label": "monotribut- left in English"
+      }
+    ],
+    "approx_word_count": 25,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-011",
+    "bank": "POS",
+    "domain": "urban-security",
+    "level": "B2",
+    "region": "MX",
+    "mode": "sentence",
+    "spanish_text": "Los vecinos de la colonia Narvarte pidieron a la alcaldía Benito Juárez más patrullas, pues los asaltos en el camión de la ruta 7 aumentaron desde que cerraron la estación del metro.",
+    "focus_traps": [
+      "regional-lexicon",
+      "names-titles-acronyms"
+    ],
+    "focus": [
+      "Regional lexicon colonia",
+      "Regional lexicon camión",
+      "Dropped place name"
+    ],
+    "errors_to_catch": [
+      "colonia rendered as colony",
+      "camión rendered as truck",
+      "Benito Juárez omitted"
+    ],
+    "why_this_chunk": "Mexico City lexicon (colonia, alcaldía, camión) where every cognate guess is wrong.",
+    "suggested_ok_english_hint": "Residents of the Narvarte neighborhood … Benito Juárez borough … robberies on the Route 7 bus …",
+    "english_key": "Residents of the Narvarte neighborhood asked the Benito Juárez borough government for more patrols, since holdups on the Route 7 bus have increased since the subway station closed.",
+    "acceptables": [
+      "Residents of the Narvarte neighborhood asked the Benito Juárez borough for more patrols because robberies on the Route 7 bus have gone up since the metro station closed."
+    ],
+    "traps": [
+      {
+        "id": "orig-011-colonia",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bcolon(y|ies)\\b",
+          "flags": "i"
+        },
+        "comment": "Mexico: colonia = neighborhood / district.",
+        "ok": "the Narvarte neighborhood",
+        "no": "the Narvarte colony",
+        "pitfall": "Regional lexicon colonia",
+        "label": "colonia rendered as colony",
+        "lemma": "colonia"
+      },
+      {
+        "id": "orig-011-camion",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\btrucks?\\b",
+          "flags": "i"
+        },
+        "comment": "Mexico: camión (de pasajeros) = bus. 'Truck' is wrong in this context (ruta 7).",
+        "ok": "the Route 7 bus",
+        "no": "the Route 7 truck",
+        "pitfall": "Regional lexicon camión",
+        "label": "camión rendered as truck",
+        "lemma": "camión"
+      },
+      {
+        "id": "orig-011-name",
+        "family": "names-titles-acronyms",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "Benito Juárez",
+            "Benito Juarez"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "Keep the borough's proper name.",
+        "ok": "the Benito Juárez borough",
+        "no": "the borough",
+        "pitfall": "Dropped place name",
+        "label": "Benito Juárez omitted"
+      }
+    ],
+    "approx_word_count": 32,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-012",
+    "bank": "POS",
+    "domain": "utilities",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "En los barrios de estratos uno y dos de Cali, la tarifa del gas subió casi 9%, mientras que los hogares de estrato seis pagan una contribución adicional que subsidia a los demás.",
+    "focus_traps": [
+      "regional-lexicon",
+      "numbers-separators",
+      "us-spelling"
+    ],
+    "focus": [
+      "Regional lexicon estrato",
+      "Dropped intensifier",
+      "US spelling"
+    ],
+    "errors_to_catch": [
+      "estrato left bare or lost",
+      "casi dropped before 9%",
+      "subsidise for subsidize"
+    ],
+    "why_this_chunk": "Colombian estrato system needs a reader-friendly rendering; adds an easy-to-drop intensifier (casi).",
+    "suggested_ok_english_hint": "In Cali's lowest-income (socioeconomic level 1 and 2) neighborhoods … nearly 9% … level 6 households …",
+    "english_key": "In Cali's socioeconomic level 1 and 2 neighborhoods, the gas rate rose almost 9%, while level 6 households pay an additional surcharge that subsidizes everyone else.",
+    "acceptables": [],
+    "traps": [
+      {
+        "id": "orig-012-estrato",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "socioeconomic",
+            "strata",
+            "stratum",
+            "income bracket",
+            "income level",
+            "income-level",
+            "lowest-income",
+            "low-income"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "estrato = Colombia's socioeconomic tier for utility billing. Render it so a US reader understands (socioeconomic level/stratum).",
+        "ok": "socioeconomic level 1 and 2",
+        "no": "estrato one and two neighborhoods",
+        "pitfall": "Regional lexicon estrato",
+        "label": "estrato left bare or lost",
+        "lemma": "estrato"
+      },
+      {
+        "id": "orig-012-casi",
+        "family": "numbers-separators",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "almost",
+            "nearly",
+            "close to",
+            "just under"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "casi 9% ≠ 9%. Dropping the hedge changes the figure.",
+        "ok": "almost 9%",
+        "no": "rose 9%",
+        "pitfall": "Dropped intensifier",
+        "label": "casi dropped before 9%",
+        "lemma": "casi"
+      },
+      {
+        "id": "orig-012-subsidize",
+        "family": "us-spelling",
+        "category": "SP",
+        "weight": 1,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bsubsidis",
+          "flags": "i"
+        },
+        "comment": "US target: subsidize, not subsidise.",
+        "ok": "subsidizes",
+        "no": "subsidises",
+        "pitfall": "US spelling",
+        "label": "subsidise for subsidize"
+      }
+    ],
+    "approx_word_count": 33,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-013",
+    "bank": "POS",
+    "domain": "urban-life",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "“Uno sale a las cinco de la mañana, se toma un tinto en la esquina y coge la buseta, porque si espera el SITP llega tarde”, contó un vigilante del barrio Kennedy.",
+    "focus_traps": [
+      "false-friends",
+      "regional-lexicon",
+      "quotes-asides"
+    ],
+    "focus": [
+      "False friend vigilante",
+      "Regional lexicon tinto",
+      "US quote punctuation"
+    ],
+    "errors_to_catch": [
+      "vigilante kept as vigilante",
+      "tinto rendered as red wine / left bare",
+      "comma outside closing quote"
+    ],
+    "why_this_chunk": "Bogotá street register inside quotes: tinto, buseta, vigilante (FF), impersonal uno, US quote punctuation.",
+    "suggested_ok_english_hint": "\"You leave at five … grab a coffee on the corner and catch the minibus … ,\" said a security guard …",
+    "english_key": "\"You leave at five in the morning, grab a black coffee on the corner, and catch the minibus, because if you wait for the SITP, you're late,\" said a security guard from the Kennedy neighborhood.",
+    "acceptables": [
+      "\"You head out at 5 a.m., have a black coffee on the corner, and catch the minibus, because if you wait for the SITP, you get there late,\" said a security guard from the Kennedy neighborhood."
+    ],
+    "traps": [
+      {
+        "id": "orig-013-vigilante",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bvigilante\\b",
+          "flags": "i"
+        },
+        "comment": "vigilante = security guard / watchman. In English a vigilante takes the law into their own hands.",
+        "ok": "a security guard",
+        "no": "a vigilante",
+        "pitfall": "False friend vigilante",
+        "label": "vigilante kept as vigilante",
+        "lemma": "vigilante"
+      },
+      {
+        "id": "orig-013-tinto",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "red wine",
+            "a tinto",
+            "tinto"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "Colombia: un tinto = a (small) black coffee, not red wine.",
+        "ok": "a black coffee",
+        "no": "a red wine",
+        "pitfall": "Regional lexicon tinto",
+        "label": "tinto rendered as red wine / left bare",
+        "lemma": "tinto"
+      },
+      {
+        "id": "orig-013-quotes",
+        "family": "quotes-asides",
+        "category": "P",
+        "weight": 2,
+        "detector": {
+          "kind": "required_pattern",
+          "pattern": ",\\\"\\s+(said|told|explained|recalled|says)\\b"
+        },
+        "comment": "US punctuation: comma inside the closing quote before the speech tag; no Spanish « » or comma outside.",
+        "ok": "…you're late,\" said…",
+        "no": "…you're late\", said…",
+        "pitfall": "US quote punctuation",
+        "label": "comma outside closing quote"
+      }
+    ],
+    "approx_word_count": 32,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-014",
+    "bank": "U",
+    "domain": "education-essay",
+    "level": "C1",
+    "mode": "sentence",
+    "spanish_text": "Sería ingenuo suponer que la brecha educativa entre el campo y la ciudad se cerrará por sí sola; sin una inversión sostenida en docentes rurales, cualquier reforma quedará en el papel.",
+    "focus_traps": [
+      "false-friends",
+      "register"
+    ],
+    "focus": [
+      "False friend campo",
+      "Idiom quedar en el papel",
+      "Register drop"
+    ],
+    "errors_to_catch": [
+      "campo rendered as field",
+      "quedará en el papel calqued",
+      "contractions in formal essay"
+    ],
+    "why_this_chunk": "Formal essay register with an idiom (quedar en el papel) and campo/ciudad that tempts 'field'.",
+    "suggested_ok_english_hint": "It would be naive to assume … between rural and urban areas … any reform will remain on paper / a dead letter.",
+    "english_key": "It would be naive to assume that the education gap between rural and urban areas will close on its own; without sustained investment in rural teachers, any reform will exist only on paper.",
+    "acceptables": [
+      "It would be naive to assume that the educational gap between the countryside and the cities will close by itself; without sustained investment in rural teachers, any reform will remain on paper."
+    ],
+    "traps": [
+      {
+        "id": "orig-014-campo",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\b(the )?field\\b",
+          "flags": "i"
+        },
+        "comment": "el campo vs la ciudad = rural areas / the countryside vs cities.",
+        "ok": "between rural and urban areas",
+        "no": "between the field and the city",
+        "pitfall": "False friend campo",
+        "label": "campo rendered as field",
+        "lemma": "campo"
+      },
+      {
+        "id": "orig-014-papel",
+        "family": "register",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\b(stay|remain|be)s?\\s+in\\s+the\\s+paper\\b",
+          "flags": "i"
+        },
+        "comment": "quedar en el papel = exist only on paper / never be implemented.",
+        "ok": "will exist only on paper",
+        "no": "will stay in the paper",
+        "pitfall": "Idiom quedar en el papel",
+        "label": "quedará en el papel calqued",
+        "lemma": "papel"
+      },
+      {
+        "id": "orig-014-contractions",
+        "family": "register",
+        "category": "U",
+        "weight": 1,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\b(won't|it'd|can't|wouldn't)\\b",
+          "flags": "i"
+        },
+        "comment": "Formal essay register: avoid contractions the source tone does not invite.",
+        "ok": "it would be naive … will exist",
+        "no": "it'd be naive … won't close",
+        "pitfall": "Register drop",
+        "label": "contractions in formal essay"
+      }
+    ],
+    "approx_word_count": 31,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-015",
+    "bank": "U",
+    "domain": "consumer-banking",
+    "level": "B2",
+    "mode": "sentence",
+    "spanish_text": "Si notas un cobro que no reconoces, bloquea tu tarjeta desde la aplicación y comunícate con nosotros; nunca te pediremos tu clave por mensaje de texto ni por correo.",
+    "focus_traps": [
+      "register",
+      "false-friends"
+    ],
+    "focus": [
+      "Register: consumer tú",
+      "Sense of clave",
+      "Sense of cobro"
+    ],
+    "errors_to_catch": [
+      "stiff register for tú copy",
+      "clave rendered as key",
+      "cobro rendered as collection"
+    ],
+    "why_this_chunk": "Consumer tú register → plain US 'you' prose; cobro and clave are sense traps.",
+    "suggested_ok_english_hint": "If you see a charge you don't recognize, lock your card in the app … we'll never ask for your PIN/password …",
+    "english_key": "If you see a charge you don't recognize, lock your card in the app and contact us; we will never ask for your PIN by text message or email.",
+    "acceptables": [
+      "If you notice a charge you don't recognize, block your card from the app and contact us; we will never ask for your password by text message or email."
+    ],
+    "traps": [
+      {
+        "id": "orig-015-register",
+        "family": "register",
+        "category": "U",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "kindly",
+            "should you",
+            "the user",
+            "hereby",
+            "please be advised"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "tú consumer copy → direct, plain US 'you'. Stiff or third-person framing changes the register.",
+        "ok": "If you see a charge…",
+        "no": "Should the user notice a charge…",
+        "pitfall": "Register: consumer tú",
+        "label": "stiff register for tú copy"
+      },
+      {
+        "id": "orig-015-clave",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\byour key\\b",
+          "flags": "i"
+        },
+        "comment": "clave (bank context) = PIN / password, not 'key'.",
+        "ok": "your PIN",
+        "no": "your key",
+        "pitfall": "Sense of clave",
+        "label": "clave rendered as key",
+        "lemma": "clave"
+      },
+      {
+        "id": "orig-015-cobro",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bcollection\\b",
+          "flags": "i"
+        },
+        "comment": "un cobro que no reconoces = a charge you don't recognize; 'collection' implies debt collection.",
+        "ok": "a charge",
+        "no": "a collection",
+        "pitfall": "Sense of cobro",
+        "label": "cobro rendered as collection",
+        "lemma": "cobro"
+      }
+    ],
+    "approx_word_count": 29,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-016",
+    "bank": "U",
+    "domain": "official-notice",
+    "level": "B2",
+    "mode": "sentence",
+    "spanish_text": "Se informa a la comunidad educativa que, por razones de fuerza mayor, las clases presenciales quedan suspendidas hasta nuevo aviso y continuarán de manera virtual.",
+    "focus_traps": [
+      "false-friends",
+      "pos-syntax",
+      "register"
+    ],
+    "focus": [
+      "Calque presencial",
+      "Fixed phrase",
+      "Stiff legalese"
+    ],
+    "errors_to_catch": [
+      "presenciales rendered as presential",
+      "hasta nuevo aviso not rendered as until further notice",
+      "fuerza mayor → force majeure in a school notice"
+    ],
+    "why_this_chunk": "Institutional notice register: plain-but-formal US, not legalese; presencial/fuerza mayor are calque magnets.",
+    "suggested_ok_english_hint": "…due to circumstances beyond our control, in-person classes are suspended until further notice and will continue online.",
+    "english_key": "The school community is advised that, due to circumstances beyond our control, in-person classes are suspended until further notice and will continue online.",
+    "acceptables": [
+      "We wish to inform the school community that, for reasons beyond our control, in-person classes are suspended until further notice and will continue online."
+    ],
+    "traps": [
+      {
+        "id": "orig-016-presencial",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bpresential\\b",
+          "flags": "i"
+        },
+        "comment": "clases presenciales = in-person classes. 'Presential' is not standard English.",
+        "ok": "in-person classes",
+        "no": "presential classes",
+        "pitfall": "Calque presencial",
+        "label": "presenciales rendered as presential",
+        "lemma": "presencial"
+      },
+      {
+        "id": "orig-016-hasta",
+        "family": "pos-syntax",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "until further notice"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "hasta nuevo aviso has a fixed equivalent: until further notice.",
+        "ok": "until further notice",
+        "no": "until new notice",
+        "pitfall": "Fixed phrase",
+        "label": "hasta nuevo aviso not rendered as until further notice"
+      },
+      {
+        "id": "orig-016-legalese",
+        "family": "register",
+        "category": "U",
+        "weight": 1,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "hereby",
+            "pursuant",
+            "heretofore",
+            "force majeure"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "School notice: 'circumstances beyond our control' reads naturally; 'force majeure' is contract legalese.",
+        "ok": "circumstances beyond our control",
+        "no": "by reason of force majeure",
+        "pitfall": "Stiff legalese",
+        "label": "fuerza mayor → force majeure in a school notice",
+        "lemma": "fuerza mayor"
+      }
+    ],
+    "approx_word_count": 25,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-017",
+    "bank": "U",
+    "domain": "opinion",
+    "level": "C1",
+    "mode": "sentence",
+    "spanish_text": "No se trata de satanizar el endeudamiento, sino de entender que un crédito mal calculado puede convertirse, en cuestión de meses, en una bola de nieve difícil de detener.",
+    "focus_traps": [
+      "register",
+      "pos-syntax"
+    ],
+    "focus": [
+      "Register satanizar",
+      "No se trata de… sino…",
+      "Dropped time frame"
+    ],
+    "errors_to_catch": [
+      "satanizar calqued",
+      "sino half dropped",
+      "en cuestión de meses omitted"
+    ],
+    "why_this_chunk": "Opinion register: no se trata de… sino de… structure, a loaded verb (satanizar), and an idiom that transfers.",
+    "suggested_ok_english_hint": "The point is not to demonize borrowing but to understand … a snowball that is hard to stop.",
+    "english_key": "The point is not to demonize debt but to understand that a poorly calculated loan can, within a matter of months, become a snowball that is hard to stop.",
+    "acceptables": [
+      "This is not a matter of demonizing debt but of understanding that a badly calculated loan can, in a matter of months, turn into a snowball that is hard to stop."
+    ],
+    "traps": [
+      {
+        "id": "orig-017-satanizar",
+        "family": "register",
+        "category": "U",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bsatani[sz]",
+          "flags": "i"
+        },
+        "comment": "satanizar = demonize. 'Satanize' is unidiomatic in US English.",
+        "ok": "demonize",
+        "no": "satanize",
+        "pitfall": "Register satanizar",
+        "label": "satanizar calqued",
+        "lemma": "satanizar"
+      },
+      {
+        "id": "orig-017-sino",
+        "family": "pos-syntax",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "but",
+            "rather",
+            "instead"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "No se trata de X sino de Y — both halves must survive: 'The point is not X but Y'. Dropping the sino-half is an omission.",
+        "ok": "The point is not to demonize debt but to understand…",
+        "no": "We should not demonize debt. A loan can become a snowball…",
+        "pitfall": "No se trata de… sino…",
+        "label": "sino half dropped",
+        "lemma": "sino"
+      },
+      {
+        "id": "orig-017-meses",
+        "family": "pos-syntax",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "months"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "en cuestión de meses — the time frame is part of the warning.",
+        "ok": "within a matter of months",
+        "no": "can become a snowball",
+        "pitfall": "Dropped time frame",
+        "label": "en cuestión de meses omitted"
+      }
+    ],
+    "approx_word_count": 29,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-018",
+    "bank": "POS",
+    "domain": "public-finance",
+    "level": "C1",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "El Ministerio de Hacienda estima que el recaudo adicional de la reforma tributaria rondará los 12 billones de pesos en 2027, una cifra que varios analistas consideran optimista.",
+    "focus_traps": [
+      "numbers-separators",
+      "institutions-headlines"
+    ],
+    "focus": [
+      "billón = trillion",
+      "Amount present",
+      "Institution Hacienda"
+    ],
+    "errors_to_catch": [
+      "billones rendered as billion",
+      "12 billones amount missing",
+      "Ministerio de Hacienda left untranslated"
+    ],
+    "why_this_chunk": "billón = trillion is the highest-cost money trap in ES→EN; plus Hacienda institution name.",
+    "suggested_ok_english_hint": "The Finance Ministry estimates … additional revenue … around 12 trillion pesos …",
+    "english_key": "The Finance Ministry estimates that the additional revenue from the tax reform will be around 12 trillion pesos in 2027, a figure that several analysts consider optimistic.",
+    "acceptables": [
+      "The Ministry of Finance estimates that the additional revenue from the tax reform will reach about 12 trillion pesos in 2027, a figure several analysts consider optimistic."
+    ],
+    "traps": [
+      {
+        "id": "orig-018-billon",
+        "family": "numbers-separators",
+        "category": "T",
+        "weight": 8,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "12 billion",
+            "twelve billion"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "Spanish billón = 10^12 = US trillion. '12 billion' is off by a factor of 1,000.",
+        "ok": "12 trillion pesos",
+        "no": "12 billion pesos",
+        "pitfall": "billón = trillion",
+        "label": "billones rendered as billion",
+        "lemma": "billón"
+      },
+      {
+        "id": "orig-018-trillion",
+        "family": "numbers-separators",
+        "category": "O",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "12 trillion",
+            "twelve trillion",
+            "12,000,000,000,000"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "The amount must come through as 12 trillion.",
+        "ok": "12 trillion pesos",
+        "pitfall": "Amount present",
+        "label": "12 billones amount missing",
+        "lemma": "billón"
+      },
+      {
+        "id": "orig-018-hacienda",
+        "family": "institutions-headlines",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "Hacienda"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "Ministerio de Hacienda = Finance Ministry / Ministry of Finance (Treasury). Don't leave 'Hacienda' in English.",
+        "ok": "The Finance Ministry",
+        "no": "The Ministry of Hacienda",
+        "pitfall": "Institution Hacienda",
+        "label": "Ministerio de Hacienda left untranslated",
+        "lemma": "Hacienda"
+      }
+    ],
+    "approx_word_count": 28,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-019",
+    "bank": "POS",
+    "domain": "monetary-policy",
+    "level": "C1",
+    "region": "MX",
+    "mode": "sentence",
+    "spanish_text": "Banxico recortó la tasa de interés objetivo en 25 puntos base, a 7,25%, y advirtió que la inflación subyacente sigue por encima de su meta de 3% más/menos un punto porcentual.",
+    "focus_traps": [
+      "numbers-separators",
+      "technical-precision"
+    ],
+    "focus": [
+      "Decimal separator",
+      "Term inflación subyacente",
+      "Term puntos base"
+    ],
+    "errors_to_catch": [
+      "7,25 left with a comma",
+      "subyacente not rendered as core inflation",
+      "puntos base mistranslated"
+    ],
+    "why_this_chunk": "Central-bank precision: basis points, decimal comma, core inflation, percentage point.",
+    "suggested_ok_english_hint": "Banxico cut its target rate by 25 basis points, to 7.25% … core inflation … 3% plus or minus one percentage point.",
+    "english_key": "Banxico cut its target interest rate by 25 basis points, to 7.25%, and warned that core inflation remains above its target of 3% plus or minus one percentage point.",
+    "acceptables": [
+      "Banxico lowered its target interest rate by 25 basis points to 7.25% and warned that core inflation is still above its 3% target, plus or minus one percentage point.",
+      "The Bank of Mexico cut its target interest rate by 25 basis points, to 7.25%, and warned that core inflation remains above its target of 3% plus or minus one percentage point."
+    ],
+    "traps": [
+      {
+        "id": "orig-019-decimal",
+        "family": "numbers-separators",
+        "category": "P",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "7,25"
+        },
+        "comment": "Spanish decimal comma → US decimal point: 7.25%.",
+        "ok": "7.25%",
+        "no": "7,25%",
+        "pitfall": "Decimal separator",
+        "label": "7,25 left with a comma"
+      },
+      {
+        "id": "orig-019-subyacente",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "core inflation"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "inflación subyacente = core inflation (standard central-bank term).",
+        "ok": "core inflation",
+        "no": "underlying inflation",
+        "pitfall": "Term inflación subyacente",
+        "label": "subyacente not rendered as core inflation",
+        "lemma": "subyacente"
+      },
+      {
+        "id": "orig-019-bp",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "basis points",
+            "basis-point",
+            "bps"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "puntos base = basis points (0.25 pp), not 'base points'.",
+        "ok": "25 basis points",
+        "no": "25 base points",
+        "pitfall": "Term puntos base",
+        "label": "puntos base mistranslated",
+        "lemma": "puntos base"
+      }
+    ],
+    "approx_word_count": 31,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-020",
+    "bank": "POS",
+    "domain": "statistics",
+    "level": "C1",
+    "mode": "sentence",
+    "spanish_text": "La tasa de desempleo pasó de 10,2% a 9,6% en un año; es decir, bajó 0,6 puntos porcentuales, y no 6%, como tituló erróneamente un diario regional.",
+    "focus_traps": [
+      "technical-precision",
+      "numbers-separators",
+      "pos-syntax"
+    ],
+    "focus": [
+      "Percent vs percentage points",
+      "Decimal separator",
+      "Dropped adverb"
+    ],
+    "errors_to_catch": [
+      "puntos porcentuales rendered as percent",
+      "decimal comma left in English",
+      "erróneamente omitted"
+    ],
+    "why_this_chunk": "Percent vs percentage points is a Meaning error graders punish; stacked decimal commas.",
+    "suggested_ok_english_hint": "…from 10.2% to 9.6% … fell 0.6 percentage points, not 6%, as a regional paper wrongly headlined.",
+    "english_key": "The unemployment rate went from 10.2% to 9.6% in one year; in other words, it fell 0.6 percentage points, not 6%, as a regional newspaper mistakenly reported in a headline.",
+    "acceptables": [],
+    "traps": [
+      {
+        "id": "orig-020-pp",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 8,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "percentage points",
+            "percentage point"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "puntos porcentuales = percentage points. Writing '0.6%' or 'points' alone confuses relative and absolute change — the whole point of the sentence.",
+        "ok": "0.6 percentage points",
+        "no": "0.6%",
+        "pitfall": "Percent vs percentage points",
+        "label": "puntos porcentuales rendered as percent"
+      },
+      {
+        "id": "orig-020-decimals",
+        "family": "numbers-separators",
+        "category": "P",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\d,\\d"
+        },
+        "comment": "All three Spanish decimal commas become US decimal points (10.2, 9.6, 0.6).",
+        "ok": "10.2% to 9.6%",
+        "no": "10,2% to 9,6%",
+        "pitfall": "Decimal separator",
+        "label": "decimal comma left in English"
+      },
+      {
+        "id": "orig-020-erroneamente",
+        "family": "pos-syntax",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "mistakenly",
+            "wrongly",
+            "erroneously",
+            "incorrectly",
+            "in error"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "erróneamente carries the writer's judgment; dropping it is an omission.",
+        "ok": "as a regional newspaper mistakenly reported",
+        "no": "as a regional newspaper reported",
+        "pitfall": "Dropped adverb",
+        "label": "erróneamente omitted",
+        "lemma": "erróneamente"
+      }
+    ],
+    "approx_word_count": 27,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-021",
+    "bank": "POS",
+    "domain": "economy",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "Las remesas que reciben los hogares colombianos superaron los US$11.800 millones el año pasado, el equivalente a cerca del 2,8% del PIB.",
+    "focus_traps": [
+      "numbers-separators",
+      "institutions-headlines"
+    ],
+    "focus": [
+      "millones → billion conversion",
+      "Acronym PIB",
+      "Decimal separator"
+    ],
+    "errors_to_catch": [
+      "11.800 millones mis-scaled",
+      "PIB left untranslated",
+      "2,8 left with a comma"
+    ],
+    "why_this_chunk": "millones with thousands point → billions in English; decimal comma; PIB → GDP.",
+    "suggested_ok_english_hint": "Remittances … exceeded US$11.8 billion … about 2.8% of GDP.",
+    "english_key": "Remittances received by Colombian households exceeded US$11.8 billion last year, the equivalent of about 2.8% of GDP.",
+    "acceptables": [
+      "Remittances received by Colombian households topped $11.8 billion last year, equivalent to about 2.8% of GDP.",
+      "Remittances received by Colombian households exceeded US$11,800 million last year, equivalent to nearly 2.8% of GDP."
+    ],
+    "traps": [
+      {
+        "id": "orig-021-billion",
+        "family": "numbers-separators",
+        "category": "T",
+        "weight": 8,
+        "detector": {
+          "kind": "required_pattern",
+          "pattern": "(11\\.8 billion|11,800 million)",
+          "flags": "i"
+        },
+        "comment": "US$11.800 millones = US$11.8 billion (or 11,800 million). The Spanish thousands point is not a decimal.",
+        "ok": "US$11.8 billion",
+        "no": "US$11.800 million",
+        "pitfall": "millones → billion conversion",
+        "label": "11.800 millones mis-scaled"
+      },
+      {
+        "id": "orig-021-gdp",
+        "family": "institutions-headlines",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "PIB",
+            "gross internal product"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "PIB = GDP in English.",
+        "ok": "of GDP",
+        "no": "of PIB",
+        "pitfall": "Acronym PIB",
+        "label": "PIB left untranslated",
+        "lemma": "PIB"
+      },
+      {
+        "id": "orig-021-decimal",
+        "family": "numbers-separators",
+        "category": "P",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "2,8"
+        },
+        "comment": "2,8% → 2.8%.",
+        "ok": "2.8%",
+        "no": "2,8%",
+        "pitfall": "Decimal separator",
+        "label": "2,8 left with a comma"
+      }
+    ],
+    "approx_word_count": 22,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-022",
+    "bank": "POS",
+    "domain": "geoscience",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "El sismo, de magnitud 6,1 y con epicentro a 30 kilómetros de Los Santos (Santander), se sintió en Bogotá; el Servicio Geológico Colombiano no reportó muertos, pero sí daños en viviendas de bahareque.",
+    "focus_traps": [
+      "numbers-separators",
+      "regional-lexicon",
+      "us-spelling"
+    ],
+    "focus": [
+      "Decimal separator",
+      "Regional building term",
+      "US spelling"
+    ],
+    "errors_to_catch": [
+      "6,1 left with a comma",
+      "bahareque dropped",
+      "kilometres for kilometers"
+    ],
+    "why_this_chunk": "Science/news precision: decimal comma in magnitude, institution name, a regional building term, and a parenthetical department.",
+    "suggested_ok_english_hint": "The magnitude 6.1 quake, centered 30 kilometers from Los Santos (Santander) … Colombian Geological Survey … wattle-and-daub houses.",
+    "english_key": "The magnitude 6.1 earthquake, centered 30 kilometers from Los Santos (Santander), was felt in Bogotá; the Colombian Geological Survey reported no deaths but did report damage to wattle-and-daub homes.",
+    "acceptables": [
+      "The 6.1-magnitude earthquake, with its epicenter 30 kilometers from Los Santos (Santander), was felt in Bogotá; the Colombian Geological Survey reported no deaths but did report damage to bahareque (wattle-and-daub) houses."
+    ],
+    "traps": [
+      {
+        "id": "orig-022-magnitude",
+        "family": "numbers-separators",
+        "category": "P",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "6,1"
+        },
+        "comment": "Magnitude 6,1 → 6.1.",
+        "ok": "magnitude 6.1",
+        "no": "magnitude 6,1",
+        "pitfall": "Decimal separator",
+        "label": "6,1 left with a comma"
+      },
+      {
+        "id": "orig-022-bahareque",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "wattle",
+            "bahareque",
+            "adobe",
+            "mud-and-cane",
+            "mud and cane",
+            "earthen"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "bahareque = wattle-and-daub (cane/bamboo frame with mud). Don't drop the building type — it explains the damage.",
+        "ok": "wattle-and-daub homes",
+        "no": "damage to homes",
+        "pitfall": "Regional building term",
+        "label": "bahareque dropped",
+        "lemma": "bahareque"
+      },
+      {
+        "id": "orig-022-kilometers",
+        "family": "us-spelling",
+        "category": "SP",
+        "weight": 1,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bkilometres\\b",
+          "flags": "i"
+        },
+        "comment": "US target: kilometers.",
+        "ok": "30 kilometers",
+        "no": "30 kilometres",
+        "pitfall": "US spelling",
+        "label": "kilometres for kilometers"
+      }
+    ],
+    "approx_word_count": 33,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-023",
+    "bank": "POS",
+    "domain": "clinical-science",
+    "level": "C1",
+    "mode": "sentence",
+    "spanish_text": "En el ensayo clínico, la mitad de los participantes recibió la vacuna y la otra mitad un placebo; la eficacia fue del 71,4% (intervalo de confianza del 95%: 63,0–78,1).",
+    "focus_traps": [
+      "false-friends",
+      "technical-precision",
+      "numbers-separators"
+    ],
+    "focus": [
+      "False friend ensayo",
+      "Statistical term",
+      "Decimal separator"
+    ],
+    "errors_to_catch": [
+      "ensayo clínico rendered as essay/test",
+      "intervalo de confianza mistranslated",
+      "decimal comma left in English"
+    ],
+    "why_this_chunk": "Science precision: ensayo clínico, CI notation, and three decimal commas inside a parenthetical.",
+    "suggested_ok_english_hint": "In the clinical trial … efficacy was 71.4% (95% confidence interval: 63.0–78.1).",
+    "english_key": "In the clinical trial, half of the participants received the vaccine and the other half a placebo; efficacy was 71.4% (95% confidence interval: 63.0–78.1).",
+    "acceptables": [],
+    "traps": [
+      {
+        "id": "orig-023-ensayo",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\b(clinical )?(essay|test)\\b",
+          "flags": "i"
+        },
+        "comment": "ensayo clínico = clinical trial, not essay or test.",
+        "ok": "clinical trial",
+        "no": "clinical essay",
+        "pitfall": "False friend ensayo",
+        "label": "ensayo clínico rendered as essay/test",
+        "lemma": "ensayo"
+      },
+      {
+        "id": "orig-023-ci",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "confidence interval",
+            "95% CI"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "intervalo de confianza = confidence interval.",
+        "ok": "95% confidence interval",
+        "no": "95% trust interval",
+        "pitfall": "Statistical term",
+        "label": "intervalo de confianza mistranslated"
+      },
+      {
+        "id": "orig-023-decimals",
+        "family": "numbers-separators",
+        "category": "P",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\d,\\d"
+        },
+        "comment": "71,4 / 63,0 / 78,1 → 71.4 / 63.0 / 78.1.",
+        "ok": "71.4%",
+        "no": "71,4%",
+        "pitfall": "Decimal separator",
+        "label": "decimal comma left in English"
+      }
+    ],
+    "approx_word_count": 29,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-024",
+    "bank": "POS",
+    "domain": "public-health",
+    "level": "C1",
+    "mode": "sentence",
+    "spanish_text": "Los resultados preliminares sugieren, aunque no demuestran, que el consumo frecuente de bebidas azucaradas se asocia con un mayor riesgo de hígado graso en adolescentes.",
+    "focus_traps": [
+      "technical-precision"
+    ],
+    "focus": [
+      "Dropped hedge",
+      "Correlation vs causation",
+      "Medical term"
+    ],
+    "errors_to_catch": [
+      "aunque no demuestran omitted",
+      "se asocia rendered as causal",
+      "hígado graso mistranslated"
+    ],
+    "why_this_chunk": "Scientific hedging must survive: sugieren/no demuestran/se asocia — overstating causality is a Meaning error.",
+    "suggested_ok_english_hint": "Preliminary results suggest, though they do not prove, … is associated with a higher risk of fatty liver …",
+    "english_key": "The preliminary results suggest, though they do not prove, that frequent consumption of sugary drinks is associated with a higher risk of fatty liver in adolescents.",
+    "acceptables": [
+      "Preliminary results suggest, but do not prove, that frequent consumption of sugar-sweetened beverages is linked to a higher risk of fatty liver in teenagers."
+    ],
+    "traps": [
+      {
+        "id": "orig-024-hedge",
+        "family": "technical-precision",
+        "category": "O",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "not prove",
+            "not demonstrate",
+            "not show",
+            "not establish",
+            "without proving"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "aunque no demuestran is the key hedge; dropping it overstates the evidence.",
+        "ok": "suggest, though they do not prove,",
+        "no": "suggest that…",
+        "pitfall": "Dropped hedge",
+        "label": "aunque no demuestran omitted"
+      },
+      {
+        "id": "orig-024-causal",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\b(causes?|leads? to|results? in)\\b",
+          "flags": "i"
+        },
+        "comment": "se asocia con = is associated with / is linked to. 'Causes' asserts causality the source denies.",
+        "ok": "is associated with",
+        "no": "causes a higher risk",
+        "pitfall": "Correlation vs causation",
+        "label": "se asocia rendered as causal"
+      },
+      {
+        "id": "orig-024-higado",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "fatty liver",
+            "hepatic steatosis",
+            "liver steatosis"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "hígado graso = fatty liver (disease).",
+        "ok": "fatty liver",
+        "no": "fat liver",
+        "pitfall": "Medical term",
+        "label": "hígado graso mistranslated",
+        "lemma": "hígado graso"
+      }
+    ],
+    "approx_word_count": 25,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-025",
+    "bank": "POS",
+    "domain": "education-data",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "Según el último informe de las pruebas Saber 11, apenas uno de cada cinco estudiantes de colegios oficiales alcanzó el nivel satisfactorio en lectura crítica.",
+    "focus_traps": [
+      "false-friends",
+      "pos-syntax",
+      "names-titles-acronyms"
+    ],
+    "focus": [
+      "False friend oficial",
+      "Dropped intensifier",
+      "Proper name of exam"
+    ],
+    "errors_to_catch": [
+      "colegios oficiales rendered as official schools",
+      "apenas omitted",
+      "Saber 11 dropped"
+    ],
+    "why_this_chunk": "Colombian test name, colegios oficiales (public schools), apenas as an intensifier that's easy to drop.",
+    "suggested_ok_english_hint": "According to the latest Saber 11 report, only one in five public-school students …",
+    "english_key": "According to the latest Saber 11 report, only one in five students at public schools reached the satisfactory level in critical reading.",
+    "acceptables": [
+      "According to the latest report on the Saber 11 exams, just one in five public school students reached the satisfactory level in critical reading."
+    ],
+    "traps": [
+      {
+        "id": "orig-025-oficiales",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "official schools"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "colegios oficiales = public (state) schools.",
+        "ok": "public schools",
+        "no": "official schools",
+        "pitfall": "False friend oficial",
+        "label": "colegios oficiales rendered as official schools",
+        "lemma": "oficial"
+      },
+      {
+        "id": "orig-025-apenas",
+        "family": "pos-syntax",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "only",
+            "just",
+            "barely",
+            "a mere"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "apenas is the point of the sentence (only one in five).",
+        "ok": "only one in five",
+        "no": "one in five students",
+        "pitfall": "Dropped intensifier",
+        "label": "apenas omitted",
+        "lemma": "apenas"
+      },
+      {
+        "id": "orig-025-saber",
+        "family": "names-titles-acronyms",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "Saber 11"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "Keep the exam's proper name (Saber 11); optional gloss: Colombia's national high school exit exam.",
+        "ok": "the latest Saber 11 report",
+        "no": "the latest national test report",
+        "pitfall": "Proper name of exam",
+        "label": "Saber 11 dropped"
+      }
+    ],
+    "approx_word_count": 25,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-026",
+    "bank": "titles",
+    "domain": "education-politics",
+    "level": "B2",
+    "region": "CO",
+    "mode": "sentence",
+    "spanish_text": "La ministra de Educación, Liliana Restrepo Arango, se reunió el lunes con la rectora de la Universidad Nacional y con el gobernador del Cauca para hablar del regreso a la presencialidad.",
+    "focus_traps": [
+      "names-titles-acronyms",
+      "false-friends"
+    ],
+    "focus": [
+      "Title caps before name",
+      "Office alone capitalized",
+      "Calque presencialidad"
+    ],
+    "errors_to_catch": [
+      "education minister lowercase before name",
+      "Governor of Cauca capped without a name",
+      "presencialidad calqued"
+    ],
+    "why_this_chunk": "Title-before-name caps vs. office-alone lowercase, rectora→university president, presencialidad calque (invented officials).",
+    "suggested_ok_english_hint": "Education Minister Liliana Restrepo Arango met Monday with the president of the National University and the governor of Cauca …",
+    "english_key": "Education Minister Liliana Restrepo Arango met on Monday with the president of the National University and the governor of Cauca to discuss the return to in-person classes.",
+    "acceptables": [
+      "The education minister, Liliana Restrepo Arango, met on Monday with the president of the National University and the governor of Cauca to discuss the return to in-person classes.",
+      "Education Minister Liliana Restrepo Arango met Monday with the rector of the National University and the governor of Cauca to discuss the return to in-person learning."
+    ],
+    "traps": [
+      {
+        "id": "orig-026-minister-caps",
+        "family": "names-titles-acronyms",
+        "category": "SP",
+        "weight": 2,
+        "detector": {
+          "kind": "title_caps",
+          "no": [
+            "education minister Liliana",
+            "minister of education Liliana",
+            "Minister Of Education"
+          ]
+        },
+        "comment": "Title directly before the name is capitalized (Education Minister Liliana Restrepo Arango). Set off by commas, lowercase is fine: 'the education minister, Liliana…'.",
+        "ok": "Education Minister Liliana Restrepo Arango",
+        "no": "education minister Liliana Restrepo Arango",
+        "pitfall": "Title caps before name",
+        "label": "education minister lowercase before name"
+      },
+      {
+        "id": "orig-026-governor-caps",
+        "family": "names-titles-acronyms",
+        "category": "SP",
+        "weight": 1,
+        "detector": {
+          "kind": "title_caps",
+          "no": [
+            "the Governor of Cauca"
+          ]
+        },
+        "comment": "Office alone (no name following) stays lowercase in US style: the governor of Cauca.",
+        "ok": "the governor of Cauca",
+        "no": "the Governor of Cauca",
+        "pitfall": "Office alone capitalized",
+        "label": "Governor of Cauca capped without a name"
+      },
+      {
+        "id": "orig-026-presencialidad",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bpresential",
+          "flags": "i"
+        },
+        "comment": "regreso a la presencialidad = return to in-person classes/learning.",
+        "ok": "the return to in-person classes",
+        "no": "the return to presentiality",
+        "pitfall": "Calque presencialidad",
+        "label": "presencialidad calqued",
+        "lemma": "presencialidad"
+      }
+    ],
+    "approx_word_count": 31,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-027",
+    "bank": "titles",
+    "domain": "economy-politics",
+    "level": "B2",
+    "region": "AR",
+    "mode": "sentence",
+    "spanish_text": "En conferencia de prensa, el jefe de Gabinete anunció que el Banco Central dejará de financiar al Tesoro, aunque no precisó a partir de qué mes regirá la medida.",
+    "focus_traps": [
+      "institutions-headlines",
+      "false-friends"
+    ],
+    "focus": [
+      "Institution jefe de Gabinete",
+      "False friend precisar",
+      "Institution Tesoro"
+    ],
+    "errors_to_catch": [
+      "jefe de Gabinete rendered as chief of staff",
+      "precisó rendered as precise",
+      "Tesoro omitted"
+    ],
+    "why_this_chunk": "Argentine institution titles (jefe de Gabinete ≠ chief of staff), Treasury/Central Bank caps, precisar FF.",
+    "suggested_ok_english_hint": "At a press conference, the cabinet chief announced … stop financing the Treasury … did not specify which month …",
+    "english_key": "At a press conference, the cabinet chief announced that the Central Bank will stop financing the Treasury, although he did not specify starting in which month the measure will take effect.",
+    "acceptables": [
+      "At a press conference, the cabinet chief announced that the Central Bank will stop financing the Treasury, though he did not specify from which month the measure will apply."
+    ],
+    "traps": [
+      {
+        "id": "orig-027-jefe",
+        "family": "institutions-headlines",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "chief of staff"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "Argentina's jefe de Gabinete (de Ministros) = cabinet chief / chief of the Cabinet of Ministers — a ministerial post, not a White House-style chief of staff.",
+        "ok": "the cabinet chief",
+        "no": "the chief of staff",
+        "pitfall": "Institution jefe de Gabinete",
+        "label": "jefe de Gabinete rendered as chief of staff",
+        "lemma": "jefe de Gabinete"
+      },
+      {
+        "id": "orig-027-precisar",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\b(precise|precised)\\b",
+          "flags": "i"
+        },
+        "comment": "no precisó = did not specify / did not say exactly.",
+        "ok": "did not specify",
+        "no": "did not precise",
+        "pitfall": "False friend precisar",
+        "label": "precisó rendered as precise",
+        "lemma": "precisar"
+      },
+      {
+        "id": "orig-027-treasury",
+        "family": "institutions-headlines",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "Treasury"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "el Tesoro = the Treasury (the national treasury). Keep it — it's who stops getting financed.",
+        "ok": "the Treasury",
+        "no": "stop financing the government",
+        "pitfall": "Institution Tesoro",
+        "label": "Tesoro omitted",
+        "lemma": "Tesoro"
+      }
+    ],
+    "approx_word_count": 29,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-028",
+    "bank": "POS",
+    "domain": "education-equity",
+    "level": "C1",
+    "region": "MX",
+    "mode": "sentence",
+    "spanish_text": "Lo preocupante no es la cifra en sí, sino la tendencia: por tercer año consecutivo, aumenta la deserción escolar entre las niñas de las zonas rurales de Chiapas.",
+    "focus_traps": [
+      "false-friends",
+      "pos-syntax"
+    ],
+    "focus": [
+      "False friend deserción",
+      "Gender-specific noun lost",
+      "POS drift lo + adjective"
+    ],
+    "errors_to_catch": [
+      "deserción rendered as desertion",
+      "niñas generalized to children",
+      "lo preocupante lost its noun head"
+    ],
+    "why_this_chunk": "Nominalized lo + adjective (POS job), deserción false friend, and a gender-specific noun that must NOT be neutralized.",
+    "suggested_ok_english_hint": "What is worrying is not the figure itself but the trend: for the third year in a row, the school dropout rate among girls …",
+    "english_key": "What is worrying is not the figure itself but the trend: for the third year in a row, school dropout among girls in rural Chiapas is rising.",
+    "acceptables": [
+      "The worrying thing is not the number itself but the trend: for the third consecutive year, school dropout among girls in rural areas of Chiapas is increasing."
+    ],
+    "traps": [
+      {
+        "id": "orig-028-desercion",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bdesertion\\b",
+          "flags": "i"
+        },
+        "comment": "deserción escolar = school dropout (rate). Desertion is military.",
+        "ok": "school dropout",
+        "no": "school desertion",
+        "pitfall": "False friend deserción",
+        "label": "deserción rendered as desertion",
+        "lemma": "deserción"
+      },
+      {
+        "id": "orig-028-ninas",
+        "family": "pos-syntax",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "girls"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "niñas is specific: girls. 'Children' or 'students' erases the gender point of the sentence.",
+        "ok": "among girls",
+        "no": "among children",
+        "pitfall": "Gender-specific noun lost",
+        "label": "niñas generalized to children",
+        "lemma": "niña"
+      },
+      {
+        "id": "orig-028-lo",
+        "family": "pos-syntax",
+        "category": "SYN",
+        "weight": 2,
+        "detector": {
+          "kind": "pos_job",
+          "job": "noun",
+          "accept": [
+            "what is worrying",
+            "what is concerning",
+            "the worrying thing",
+            "the concern",
+            "the worrying part",
+            "what's worrying",
+            "what's concerning"
+          ],
+          "reject": [
+            "the worrying is",
+            "worrying is not",
+            "concerning is not"
+          ]
+        },
+        "comment": "Lo preocupante = a noun-like head: 'What is worrying' / 'The worrying thing'. Bare 'Worrying is not…' loses the noun job.",
+        "ok": "What is worrying is not…",
+        "no": "Worrying is not the figure…",
+        "pitfall": "POS drift lo + adjective",
+        "label": "lo preocupante lost its noun head"
+      }
+    ],
+    "approx_word_count": 28,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-029",
+    "bank": "O",
+    "domain": "urban-transit-essay",
+    "level": "C1",
+    "region": "CO",
+    "mode": "short-paragraph",
+    "spanish_text": "La llegada del metro a Bogotá fue, durante más de setenta años, una promesa recurrente de campaña. Cada administración presentó estudios, diseños y maquetas; ninguna puso la primera piedra. Hoy, con las obras avanzadas sobre la avenida Primero de Mayo, el escepticismo de los bogotanos empieza a ceder, aunque muchos todavía dudan de que la primera línea esté lista a tiempo.",
+    "focus_traps": [
+      "false-friends",
+      "numbers-separators"
+    ],
+    "focus": [
+      "Idiom primera piedra",
+      "False friend ceder",
+      "Dropped time span"
+    ],
+    "errors_to_catch": [
+      "puso la primera piedra calqued",
+      "ceder rendered as cede",
+      "setenta años omitted"
+    ],
+    "why_this_chunk": "Cohesive mini-essay: idiom (poner la primera piedra), ceder FF, serial list, time span, concessive close.",
+    "suggested_ok_english_hint": "For more than seventy years … none broke ground … skepticism is starting to fade, although many still doubt …",
+    "english_key": "For more than seventy years, bringing a subway to Bogotá was a recurring campaign promise. Every administration presented studies, designs, and models; none broke ground. Today, with construction well along on Avenida Primero de Mayo, Bogotá residents' skepticism is beginning to fade, although many still doubt that the first line will be finished on time.",
+    "acceptables": [
+      "For more than 70 years, the arrival of the metro in Bogotá was a recurring campaign promise. Each administration presented studies, designs, and scale models; none laid the cornerstone. Today, with work well advanced on Avenida Primero de Mayo, the skepticism of Bogotá residents is starting to ease, although many still doubt the first line will be ready on time."
+    ],
+    "traps": [
+      {
+        "id": "orig-029-piedra",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_span",
+          "anyOf": [
+            "first stone"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "poner la primera piedra = break ground / lay the cornerstone. 'Put the first stone' is a calque.",
+        "ok": "none broke ground",
+        "no": "none put the first stone",
+        "pitfall": "Idiom primera piedra",
+        "label": "puso la primera piedra calqued",
+        "lemma": "primera piedra"
+      },
+      {
+        "id": "orig-029-ceder",
+        "family": "false-friends",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bcede",
+          "flags": "i"
+        },
+        "comment": "ceder here = fade / ease / give way. 'Cede' means to hand over territory or rights.",
+        "ok": "is beginning to fade",
+        "no": "is beginning to cede",
+        "pitfall": "False friend ceder",
+        "label": "ceder rendered as cede",
+        "lemma": "ceder"
+      },
+      {
+        "id": "orig-029-seventy",
+        "family": "numbers-separators",
+        "category": "O",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "seventy",
+            "70"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "durante más de setenta años — the span is the hook of the paragraph.",
+        "ok": "for more than seventy years",
+        "no": "for decades",
+        "pitfall": "Dropped time span",
+        "label": "setenta años omitted"
+      }
+    ],
+    "approx_word_count": 61,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-030",
+    "bank": "POS",
+    "domain": "biology",
+    "level": "C1",
+    "region": "MX",
+    "mode": "short-paragraph",
+    "spanish_text": "Un equipo de la UNAM documentó que el ajolote de Xochimilco, especie endémica en peligro crítico de extinción, sobrevive mejor en los canales donde los chinamperos han dejado de usar agroquímicos. Los investigadores advierten, sin embargo, que la población silvestre sigue siendo muy pequeña y que la mejora en la calidad del agua todavía no basta para revertir el declive.",
+    "focus_traps": [
+      "technical-precision",
+      "regional-lexicon",
+      "pos-syntax"
+    ],
+    "focus": [
+      "Conservation status term",
+      "Regional lexicon chinampero",
+      "Dropped connector"
+    ],
+    "errors_to_catch": [
+      "en peligro crítico not rendered as critically endangered",
+      "chinamperos flattened to farmers",
+      "sin embargo omitted"
+    ],
+    "why_this_chunk": "Science paragraph with Mexican lexicon (ajolote, chinamperos), a conservation-status term, and a however-contrast.",
+    "suggested_ok_english_hint": "A UNAM team documented that the Xochimilco axolotl, a critically endangered endemic species, … chinampa farmers … The researchers warn, however, …",
+    "english_key": "A UNAM team documented that the Xochimilco axolotl, a critically endangered endemic species, survives better in canals where chinampa farmers have stopped using agrochemicals. The researchers warn, however, that the wild population remains very small and that the improvement in water quality is still not enough to reverse the decline.",
+    "acceptables": [
+      "A team from UNAM documented that the Xochimilco axolotl, an endemic, critically endangered species, survives better in canals where chinampa farmers have stopped using agrochemicals. However, the researchers warn that the wild population is still very small and that the improvement in water quality is not yet enough to reverse the decline."
+    ],
+    "traps": [
+      {
+        "id": "orig-030-critico",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "critically endangered"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "en peligro crítico de extinción = critically endangered (IUCN category). 'In critical danger of extinction' is a calque that loses the term of art.",
+        "ok": "critically endangered",
+        "no": "in critical danger of extinction",
+        "pitfall": "Conservation status term",
+        "label": "en peligro crítico not rendered as critically endangered"
+      },
+      {
+        "id": "orig-030-chinamperos",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "chinampa"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "chinamperos = chinampa farmers (farmers of Xochimilco's floating gardens). Keep 'chinampa' — it's the place-specific term.",
+        "ok": "chinampa farmers",
+        "no": "local farmers",
+        "pitfall": "Regional lexicon chinampero",
+        "label": "chinamperos flattened to farmers",
+        "lemma": "chinampero"
+      },
+      {
+        "id": "orig-030-however",
+        "family": "pos-syntax",
+        "category": "O",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "however",
+            "nevertheless",
+            "nonetheless",
+            "but",
+            "yet"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "sin embargo signals the turn; dropping it loses the paragraph's logic.",
+        "ok": "The researchers warn, however,",
+        "no": "The researchers warn that…",
+        "pitfall": "Dropped connector",
+        "label": "sin embargo omitted",
+        "lemma": "sin embargo"
+      }
+    ],
+    "approx_word_count": 60,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-031",
+    "bank": "POS",
+    "domain": "household-finance",
+    "level": "C1",
+    "region": "AR",
+    "mode": "short-paragraph",
+    "spanish_text": "Para muchas familias de clase media, el plazo fijo dejó de ser un refugio: con una inflación mensual de dos dígitos, los intereses no alcanzaban a cubrir la pérdida de poder adquisitivo. La alternativa fue comprar dólares en el mercado paralelo, el llamado dólar blue, pese a que la brecha con el tipo de cambio oficial superaba entonces el 100%.",
+    "focus_traps": [
+      "regional-lexicon",
+      "technical-precision"
+    ],
+    "focus": [
+      "Regional lexicon plazo fijo",
+      "Economics term",
+      "Economics term tipo de cambio"
+    ],
+    "errors_to_catch": [
+      "plazo fijo mistranslated",
+      "poder adquisitivo mistranslated",
+      "tipo de cambio not rendered as exchange rate"
+    ],
+    "why_this_chunk": "Argentine personal-finance paragraph: plazo fijo, poder adquisitivo, dólar blue, brecha cambiaria — every term has a fixed English equivalent.",
+    "suggested_ok_english_hint": "…the fixed-term deposit stopped being a safe haven … purchasing power … the so-called blue dollar … official exchange rate …",
+    "english_key": "For many middle-class families, the fixed-term deposit stopped being a safe haven: with double-digit monthly inflation, the interest did not cover the loss of purchasing power. The alternative was to buy dollars on the parallel market, the so-called blue dollar, even though the gap with the official exchange rate exceeded 100% at the time.",
+    "acceptables": [
+      "For many middle-class families, time deposits stopped being a refuge: with double-digit monthly inflation, interest wasn't enough to cover the loss of purchasing power. The alternative was buying dollars on the parallel market, the so-called \"blue dollar,\" even though the gap with the official exchange rate was over 100% at the time."
+    ],
+    "traps": [
+      {
+        "id": "orig-031-plazofijo",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "fixed-term deposit",
+            "time deposit",
+            "term deposit",
+            "certificate of deposit",
+            "CD",
+            "CDs",
+            "fixed-rate deposit"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "plazo fijo = fixed-term (time) deposit / CD. 'Fixed term' alone or 'fixed deadline' misses the banking product.",
+        "ok": "the fixed-term deposit",
+        "no": "the fixed deadline",
+        "pitfall": "Regional lexicon plazo fijo",
+        "label": "plazo fijo mistranslated",
+        "lemma": "plazo fijo"
+      },
+      {
+        "id": "orig-031-poder",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "purchasing power",
+            "buying power"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "poder adquisitivo = purchasing power.",
+        "ok": "the loss of purchasing power",
+        "no": "the loss of acquisitive power",
+        "pitfall": "Economics term",
+        "label": "poder adquisitivo mistranslated",
+        "lemma": "poder adquisitivo"
+      },
+      {
+        "id": "orig-031-tipo",
+        "family": "technical-precision",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "required_span",
+          "anyOf": [
+            "exchange rate"
+          ],
+          "caseSensitive": false
+        },
+        "comment": "tipo de cambio oficial = official exchange rate.",
+        "ok": "the official exchange rate",
+        "no": "the official change type",
+        "pitfall": "Economics term tipo de cambio",
+        "label": "tipo de cambio not rendered as exchange rate",
+        "lemma": "tipo de cambio"
+      }
+    ],
+    "approx_word_count": 60,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  },
+  {
+    "id": "orig-032",
+    "bank": "U",
+    "domain": "rural-education",
+    "level": "C1",
+    "region": "CO",
+    "mode": "short-paragraph",
+    "spanish_text": "En la vereda La Esperanza, a dos horas a lomo de mula de la cabecera municipal, la escuela tiene una sola maestra para veintitrés niños de seis grados distintos. “Aquí no hay internet, pero hay ganas”, dice ella, mientras reparte las guías que imprimió con su propio sueldo. La Secretaría de Educación departamental asegura que el nombramiento de un segundo docente está en trámite.",
+    "focus_traps": [
+      "regional-lexicon",
+      "institutions-headlines",
+      "quotes-asides"
+    ],
+    "focus": [
+      "Regional lexicon vereda",
+      "Office vs officeholder",
+      "US quote punctuation"
+    ],
+    "errors_to_catch": [
+      "vereda rendered as sidewalk",
+      "Secretaría rendered as Secretary",
+      "comma outside closing quote"
+    ],
+    "why_this_chunk": "Colombian rural lexicon (vereda, cabecera municipal), a quote with US punctuation, and an office-vs-person title trap.",
+    "suggested_ok_english_hint": "In the rural district of La Esperanza, two hours by mule from the town center … \"…,\" she says … the departmental education office says …",
+    "english_key": "In the rural district of La Esperanza, two hours by mule from the town center, the school has a single teacher for twenty-three children in six different grades. \"There's no internet here, but there's determination,\" she says as she hands out the worksheets she printed with her own salary. The departmental Education Office says the appointment of a second teacher is in process.",
+    "acceptables": [
+      "In the La Esperanza rural district, two hours by mule from the municipal seat, the school has only one teacher for twenty-three children in six different grades. \"We don't have internet here, but we have drive,\" she says, while handing out the study guides she printed with her own salary. The departmental education department says the appointment of a second teacher is being processed."
+    ],
+    "traps": [
+      {
+        "id": "orig-032-vereda",
+        "family": "regional-lexicon",
+        "category": "T",
+        "weight": 4,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bsidewalk",
+          "flags": "i"
+        },
+        "comment": "Colombia: vereda = rural district / hamlet (administrative subdivision of a municipality). 'Sidewalk' is the Southern Cone sense and is wrong here.",
+        "ok": "In the rural district of La Esperanza",
+        "no": "On the La Esperanza sidewalk",
+        "pitfall": "Regional lexicon vereda",
+        "label": "vereda rendered as sidewalk",
+        "lemma": "vereda"
+      },
+      {
+        "id": "orig-032-secretaria",
+        "family": "institutions-headlines",
+        "category": "T",
+        "weight": 2,
+        "detector": {
+          "kind": "forbidden_pattern",
+          "pattern": "\\bSecretary of Education\\b",
+          "flags": "i"
+        },
+        "comment": "Secretaría de Educación = the education office/department (an agency), not the Secretary (a person).",
+        "ok": "the departmental Education Office",
+        "no": "the departmental Secretary of Education",
+        "pitfall": "Office vs officeholder",
+        "label": "Secretaría rendered as Secretary",
+        "lemma": "Secretaría"
+      },
+      {
+        "id": "orig-032-quotes",
+        "family": "quotes-asides",
+        "category": "P",
+        "weight": 2,
+        "detector": {
+          "kind": "required_pattern",
+          "pattern": ",\\\"\\s+(she|the teacher)\\s+(says|said)"
+        },
+        "comment": "US punctuation: comma inside the closing quote before the speech tag.",
+        "ok": "…determination,\" she says",
+        "no": "…determination\", she says",
+        "pitfall": "US quote punctuation",
+        "label": "comma outside closing quote"
+      }
+    ],
+    "approx_word_count": 64,
+    "publishable": true,
+    "private": false,
+    "visibility": "public",
+    "source": "original-grok-bot-2026-10-07"
+  }
+]

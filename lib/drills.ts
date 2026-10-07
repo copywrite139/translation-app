@@ -1,3 +1,5 @@
+import originalMicrosDraft from "../data/public/original-micros.json";
+import { orderPracticeItems } from "./practiceOrder";
 import { gradeItem, gradePassage, splitEnglishSentences, wordCount } from "./scoring";
 import {
   Bank,
@@ -2908,13 +2910,82 @@ export function validateContent(): void {
   }
 }
 
+type OriginalPublicMicro = {
+  id: string;
+  bank: Bank;
+  domain: string;
+  level?: string;
+  mode: "sentence" | "short-paragraph";
+  spanish_text: string;
+  english_key: string;
+  acceptables?: string[];
+  suggested_ok_english_hint: string;
+  why_this_chunk: string;
+  publishable: boolean;
+  private: boolean;
+  visibility: string;
+  traps: {
+    id: string;
+    category: ErrorCat;
+    weight: Weight;
+    detector: DetectorSpec;
+    comment: string;
+    ok?: string;
+    no?: string;
+    pitfall: string;
+    label: string;
+    lemma?: string;
+  }[];
+};
+
+/** Publishable originals only. focus and errors_to_catch come from micro(), not the JSON. */
+function originalPublicMicros(): DrillItem[] {
+  const rows = originalMicrosDraft as unknown as OriginalPublicMicro[];
+  return rows.map((row) => {
+    if (!row.publishable || row.private || row.visibility !== "public" || !row.id.startsWith("orig-")) {
+      throw new Error(`Refusing non-public original micro ${row.id}`);
+    }
+    const built = micro({
+      id: row.id,
+      bank: row.bank,
+      domain: row.domain,
+      level: row.level,
+      spanish: row.spanish_text,
+      english: row.english_key,
+      acceptables: row.acceptables,
+      traps: row.traps.map((spec) =>
+        trap({
+          id: spec.id,
+          category: spec.category,
+          weight: spec.weight,
+          detector: spec.detector,
+          comment: spec.comment,
+          ok: spec.ok,
+          no: spec.no,
+          pitfall: spec.pitfall,
+          label: spec.label,
+          lemma: spec.lemma,
+        })
+      ),
+    });
+    return {
+      ...built,
+      coachHint: row.suggested_ok_english_hint,
+      why: row.why_this_chunk,
+      microShape: row.mode,
+    };
+  });
+}
+
+for (const item of originalPublicMicros()) MICROS.push(item);
+
 validateContent();
 
 export function getMicro(id: string): DrillItem | undefined {
   return MICROS.find((m) => m.id === id);
 }
 
-/** The 15 sentences that already ship on /practice, in their original order. */
+/** The 15 sentences that ship on /practice, in source order. Display order is applied separately. */
 export function corePractice(): DrillItem[] {
   return ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
     .map((id) => getMicro(id))
@@ -2943,6 +3014,9 @@ export function selectMicros(opts: {
   todayPitfalls?: string[];
   todayLemmas?: string[];
   todayCategories?: ErrorCat[];
+  /** When set, ties (and an empty ledger) are shuffled instead of sorted by id. */
+  orderSeed?: string;
+  seenIds?: Iterable<string>;
 }): DrillItem[] {
   if (opts.itemId) {
     const one = getMicro(opts.itemId);
@@ -2975,11 +3049,14 @@ export function selectMicros(opts: {
     );
     pool = matched.length ? matched : pool.filter((m) => m.bank === (BANK_FOR_CATEGORY[opts.weakest ?? "O"] ?? "O"));
   }
-  const ranked = pool
-    .map((item) => ({
-      item,
-      heat: item.traps.reduce((sum, t) => sum + (opts.heat[t.id] ?? 0), 0),
-    }))
-    .sort((a, b) => b.heat - a.heat || a.item.id.localeCompare(b.item.id));
-  return ranked.slice(0, opts.count).map((r) => r.item);
+  const ranked = opts.orderSeed
+    ? orderPracticeItems(pool, { seed: opts.orderSeed, heat: opts.heat, seenIds: opts.seenIds })
+    : pool
+        .map((item) => ({
+          item,
+          heat: item.traps.reduce((sum, t) => sum + (opts.heat[t.id] ?? 0), 0),
+        }))
+        .sort((a, b) => b.heat - a.heat || a.item.id.localeCompare(b.item.id))
+        .map((row) => row.item);
+  return ranked.slice(0, opts.count);
 }

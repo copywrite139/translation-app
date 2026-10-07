@@ -56,6 +56,33 @@ export default function Home() {
       </p>
 
       <section style={{ marginTop: "1.4rem" }}>
+        <h2>Start practice</h2>
+        <nav aria-label="Banks" style={{ display: "flex", gap: "0.9rem", flexWrap: "wrap", alignItems: "center" }}>
+          <Link
+            href="/practice"
+            style={{
+              display: "inline-block",
+              padding: "10px 16px",
+              background: "#007bff",
+              color: "white",
+              borderRadius: "6px",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
+            Practice
+          </Link>
+          <Link href="/practice?bank=P">P</Link>
+          <Link href="/practice?bank=O">O</Link>
+          <Link href="/practice?bank=POS">POS</Link>
+          <Link href="/practice?bank=titles">Titles</Link>
+          <Link href="/practice?bank=U">U</Link>
+          <Link href="/passage">Passage</Link>
+          <Link href="/practice?bank=private">Private unlock</Link>
+        </nav>
+      </section>
+
+      <section style={{ marginTop: "1.4rem" }}>
         <h2>Today · {plan.kind}</h2>
         <p>Two hours. The blocks below are the whole day.</p>
         <div style={{ display: "grid", gap: "0.8rem" }}>
@@ -71,14 +98,6 @@ export default function Home() {
           ))}
         </div>
         <p style={{ color: "#444" }}>{WEEKLY_NOTE}</p>
-      </section>
-
-      <section style={{ marginTop: "1.2rem", display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
-        <Link href="/practice">Practice</Link>
-        <Link href="/practice?bank=P&minutes=10">10-minute P micro</Link>
-        <Link href="/practice?bank=O&minutes=10">10-minute O micro</Link>
-        <Link href="/practice?bank=POS&minutes=10&item=pos-compromiso">POS: compromiso</Link>
-        <Link href="/passage?minutes=90">90-minute passage</Link>
       </section>
 
       <section id="ledger" style={{ marginTop: "2rem" }}>
