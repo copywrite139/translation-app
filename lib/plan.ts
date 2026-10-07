@@ -80,7 +80,7 @@ export function todayPlan(now: Date, weakest: ErrorCat): DayPlan {
           id: "C",
           minutes: 30,
           title: "POS from the ledger",
-          detail: "Same bank, hottest traps first.",
+          detail: "Unseen items in this bank first, then the hottest traps.",
           href: "/practice?bank=POS&minutes=30&count=6",
         },
         {
