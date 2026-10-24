@@ -1,3 +1,4 @@
+import ed150Goldens from "./ed150-goldens.json";
 import { getMicro, MICROS, PASSAGE } from "../lib/drills";
 import { PRIVATE_FRIEND_MICROS } from "../lib/privateFriendMicros";
 import { gradeItem, gradePassage, GradeResult } from "../lib/scoring";
@@ -211,6 +212,23 @@ for (const item of MICROS) {
 const passage = gradePassage(PASSAGE, PASSAGE.english);
 if (passage.verdict !== "Perfect" || passage.points !== 0 || passage.fired.length !== 0) {
   fail(`passage key ${passage.verdict} points=${passage.points}`);
+}
+
+const ed150 = MICROS.filter((item) => item.id.startsWith("ed150-"));
+if (ed150.length !== 150) fail(`expected 150 ed150 micros, got ${ed150.length}`);
+const seenIds = new Set<string>();
+for (const item of MICROS) {
+  if (seenIds.has(item.id)) fail(`duplicate micro id ${item.id}`);
+  seenIds.add(item.id);
+}
+
+for (const golden of ed150Goldens) {
+  const item = getMicro(golden.id);
+  if (!item) fail(`missing ${golden.id}`);
+  const grade = gradeItem(item, golden.text);
+  assertInvariant(golden.id, grade);
+  for (const trapId of golden.expect) expectFired(golden.id, grade, trapId);
+  if (grade.perfect || grade.points === 0) fail(`${golden.id} soft-scored Perfect/0`);
 }
 
 console.log("grader goldens ok");

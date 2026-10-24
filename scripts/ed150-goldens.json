@@ -1,0 +1,14 @@
+[
+ {"id":"ed150-001","text":"Although the proposal was well received by the neighbors, several representatives questioned both its cost as well as the lack of a clear timeline for implementing it.","expect":["ed150-001-both-and","ed150-001-vecinos"]},
+ {"id":"ed150-005","text":"Even though the company said it would finish the works in december, residents still had not received any information about the announced changes.","expect":["ed150-005-obras","ed150-005-month-caps"]},
+ {"id":"ed150-028","text":"Even if the budget is approved tomorrow, the work would not begin until the environmental authority would issue the corresponding permit.","expect":["ed150-028-were","ed150-028-until-would"]},
+ {"id":"ed150-078","text":"The doctor Ramírez who led the study, stated that the conclusions should be interpreted with caution because of the sample size.","expect":["ed150-078-title","ed150-078-nonrestrictive"]},
+ {"id":"ed150-082","text":"The study revealed that about 40 % of respondents were aware that the program existed and that few knew how to apply for it.","expect":["ed150-082-percent","ed150-082-unaware"]},
+ {"id":"ed150-102","text":"The office did not confirm nor deny the published information but announced that it would issue a communiqué once the investigation would be concluded.","expect":["ed150-102-not-nor","ed150-102-once-would","ed150-102-comunicado"]},
+ {"id":"ed150-117","text":"The entity confirmed that the benefit had been granted to 2.450 people, 175 of which had not yet received the first payment.","expect":["ed150-117-thousands","ed150-117-of-which","ed150-117-entidad"]},
+ {"id":"ed150-127","text":"Under no circumstances failure to respond shall be construed as automatic acceptance of the proposed terms.","expect":["ed150-127-inversion"]},
+ {"id":"ed150-140","text":"According to official ciphers, 12.750 applications were received in the second trimester, approximately a third more than in the previous quarter.","expect":["ed150-140-thousands","ed150-140-trimestre","ed150-140-cifras"]},
+ {"id":"ed150-147","text":"At least, a discrepancy emerged between the number of registered beneficiaries and the number of payments effectively made.","expect":["ed150-147-at-least","ed150-147-efectivamente"]},
+ {"id":"ed150-133","text":"The company announced that it would eventually expand its operations but made clear that it had not yet taken a final decision.","expect":["ed150-133-eventual","ed150-133-taken-decision"]},
+ {"id":"ed150-121","text":"Neither the age of the property or its market value are sufficient in itself to determine whether it should be declared cultural patrimony.","expect":["ed150-121-neither-nor","ed150-121-agreement","ed150-121-patrimonio"]}
+]
