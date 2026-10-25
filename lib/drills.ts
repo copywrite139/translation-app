@@ -1,3 +1,4 @@
+import ed150Micros from "../data/public/ed150-micros.json";
 import originalMicrosDraft from "../data/public/original-micros.json";
 import { orderPracticeItems } from "./practiceOrder";
 import { gradeItem, gradePassage, splitEnglishSentences, wordCount } from "./scoring";
@@ -2939,10 +2940,9 @@ type OriginalPublicMicro = {
 };
 
 /** Publishable originals only. focus and errors_to_catch come from micro(), not the JSON. */
-function originalPublicMicros(): DrillItem[] {
-  const rows = originalMicrosDraft as unknown as OriginalPublicMicro[];
+function publicMicrosFrom(rows: OriginalPublicMicro[], prefix: string): DrillItem[] {
   return rows.map((row) => {
-    if (!row.publishable || row.private || row.visibility !== "public" || !row.id.startsWith("orig-")) {
+    if (!row.publishable || row.private || row.visibility !== "public" || !row.id.startsWith(prefix)) {
       throw new Error(`Refusing non-public original micro ${row.id}`);
     }
     const built = micro({
@@ -2977,7 +2977,8 @@ function originalPublicMicros(): DrillItem[] {
   });
 }
 
-for (const item of originalPublicMicros()) MICROS.push(item);
+for (const item of publicMicrosFrom(originalMicrosDraft as unknown as OriginalPublicMicro[], "orig-")) MICROS.push(item);
+for (const item of publicMicrosFrom(ed150Micros as unknown as OriginalPublicMicro[], "ed150-")) MICROS.push(item);
 
 validateContent();
 
