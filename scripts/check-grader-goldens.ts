@@ -215,7 +215,7 @@ if (passage.verdict !== "Perfect" || passage.points !== 0 || passage.fired.lengt
 }
 
 const ed150 = MICROS.filter((item) => item.id.startsWith("ed150-"));
-if (ed150.length !== 150) fail(`expected 150 ed150 micros, got ${ed150.length}`);
+if (ed150.length !== 300) fail(`expected 300 ed150 micros, got ${ed150.length}`);
 const seenIds = new Set<string>();
 for (const item of MICROS) {
   if (seenIds.has(item.id)) fail(`duplicate micro id ${item.id}`);
